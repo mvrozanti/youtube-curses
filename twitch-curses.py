@@ -107,7 +107,7 @@ try:
 			stdscr.addstr(1,0,"too small")
 		key = stdscr.getch()
 		if key == curses.KEY_DOWN:
-			if highlight + page * maxitems + 1 != totalitems:
+			if highlight + page * maxitems + 1 < totalitems:
 				if highlight + 1 == maxitems:
 					page += 1
 					highlight = 0
