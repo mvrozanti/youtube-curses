@@ -54,6 +54,8 @@ data = query_twitch("topgames", 0)
 highlight = 0
 page = 0
 state = "top"
+q = ["source", "high", "medium", "low", "mobile", "audio"]
+quality = 0
 key = 0
 try:
 	while key != ord('q'):
@@ -86,13 +88,15 @@ try:
 					if index < maxitems:
 						if index == highlight:
 							win_l.addnstr(index*2+2, 2, str(i['channel']['display_name']), maxlen, curses.A_REVERSE)
+							win_r.addnstr(windowsize[0]-3, 2, "quality: +-", maxlen)
+							win_r.addnstr(windowsize[0]-2, 3, q[quality], maxlen)
 							win_r.addnstr(2, 3, str(i['game']), maxlen)
 							win_r.addnstr(4, 3, "Viewers: "+str(i['viewers']), maxlen)
 							win_r.addstr(5, 3, "Status:")
 							status = textwrap.wrap(str(i['channel']['status']), windowsize[1]//2-6)
 							l_num = 7
 							for line in status:
-								if l_num >= windowsize[0] - 2:
+								if l_num >= windowsize[0] - 4:
 									break
 								win_r.addstr(l_num, 4, line)
 								l_num += 1
@@ -130,7 +134,7 @@ try:
 				curses.nocbreak(); stdscr.keypad(0); curses.echo()
 				curses.endwin()
 				print("twitch-cli: Launching livestreamer")
-				subprocess.call(["livestreamer", currentpage[highlight]['channel']['url'], "best"])
+				subprocess.call(["livestreamer", currentpage[highlight]['channel']['url'], q[quality]+",best"])
 				stdscr = curses.initscr()
 				curses.noecho()
 				curses.cbreak()
@@ -149,6 +153,10 @@ try:
 				state = "top"
 				highlight = 0
 				page = 0
+		elif key == ord('+') and quality > 0:
+			quality -= 1
+		elif key == ord('-') and quality < 5:
+			quality += 1
 		elif key == ord('s'):
 			searchbox = curses.newwin(3, windowsize[1]-4, windowsize[0]//2-1, 2)
 			searchbox.border(0)
