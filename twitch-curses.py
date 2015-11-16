@@ -20,6 +20,7 @@ def init_display(stdscr):
 	stdscr.clear()
 	size = stdscr.getmaxyx()
 	stdscr.addstr(size[0]//2-1, size[1]//2-5, "Loading...")
+	stdscr.move(0,0)
 	stdscr.refresh()
 	maxlen = size[1] // 2 - 4
 	maxitems = size[0] // 2 - 1
