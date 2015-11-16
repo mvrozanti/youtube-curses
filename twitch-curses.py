@@ -2,15 +2,20 @@
 import curses, json, pycurl, subprocess, textwrap
 from io import BytesIO
 
-proxy = ""
-query_limit = "75"
-
-print("twitch-cli: Initializing")
+print("[twitch-curses] Initializing")
 stdscr = curses.initscr()
 curses.noecho()
 curses.cbreak()
 stdscr.keypad(1)
 curses.curs_set(0)
+
+query_limit = "75"
+highlight = 0
+page = 0
+state = "top"
+q = ["source", "high", "medium", "low", "mobile", "audio"]
+quality = 0
+key = 0
 
 def init_display(stdscr): 
 	global maxlen
@@ -41,8 +46,6 @@ def query_twitch(query, search):
 	c = pycurl.Curl()
 	c.setopt(c.URL, url)
 	c.setopt(c.WRITEDATA, buf)
-	if proxy != "":
-		c.setopt(c.PROXY, 'socks5h://'+proxy)
 	c.perform()
 	c.close()
 	body = buf.getvalue()
@@ -52,12 +55,6 @@ def query_twitch(query, search):
 windowsize = init_display(stdscr)
 data = query_twitch("topgames", 0)
 
-highlight = 0
-page = 0
-state = "top"
-q = ["source", "high", "medium", "low", "mobile", "audio"]
-quality = 0
-key = 0
 try:
 	while key != ord('q'):
 		if windowsize[0] > 8 and windowsize[1] > 30:
@@ -134,7 +131,7 @@ try:
 			if state == "search":
 				curses.nocbreak(); stdscr.keypad(0); curses.echo()
 				curses.endwin()
-				print("twitch-cli: Launching livestreamer")
+				print("[twitch-curses]: Launching livestreamer")
 				subprocess.call(["livestreamer", currentpage[highlight]['channel']['url'], q[quality]+",best"])
 				stdscr = curses.initscr()
 				curses.noecho()
@@ -187,4 +184,4 @@ try:
 finally:
 	curses.nocbreak(); stdscr.keypad(0); curses.echo()
 	curses.endwin()
-	print("twitch-cli: Exiting")
+	print("[twitch-curses]: Exiting")
