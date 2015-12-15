@@ -131,7 +131,7 @@ try:
 			if state == "search":
 				curses.nocbreak(); stdscr.keypad(0); curses.echo()
 				curses.endwin()
-				print("[twitch-curses]: Launching livestreamer")
+				print("[twitch-curses] Launching livestreamer")
 				subprocess.call(["livestreamer", currentpage[highlight]['channel']['url'], q[quality]+",best"])
 				stdscr = curses.initscr()
 				curses.noecho()
@@ -184,4 +184,4 @@ try:
 finally:
 	curses.nocbreak(); stdscr.keypad(0); curses.echo()
 	curses.endwin()
-	print("[twitch-curses]: Exiting")
+	print("[twitch-curses] Exiting")
