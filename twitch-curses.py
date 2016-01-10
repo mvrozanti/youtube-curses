@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import curses, json, pycurl, subprocess, textwrap
+import curses, json, pycurl, subprocess, textwrap, urllib.parse
 from io import BytesIO
 
 print("[twitch-curses] Initializing")
@@ -35,12 +35,12 @@ def init_display(stdscr):
 
 def query_twitch(query, search):
 	if search:
-		query = query.replace(" ", "+")
+		query = urllib.parse.quote(query)
 		url = "https://api.twitch.tv/kraken/search/streams?limit="+query_limit+"&q="+query
 	elif query == "topgames":
 		url = "https://api.twitch.tv/kraken/games/top?limit="+query_limit
 	else:
-		query = query.replace(" ", "+")
+		query = urllib.parse.quote(query)
 		url = "https://api.twitch.tv/kraken/streams?limit="+query_limit+"&game="+query
 	buf = BytesIO()
 	c = pycurl.Curl()
