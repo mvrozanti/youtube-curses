@@ -52,10 +52,9 @@ def query_twitch(query, search):
 	buf.close()
 	return json.loads(body.decode('utf-8'))
 
-windowsize = init_display(stdscr)
-data = query_twitch("topgames", 0)
-
 try:
+	windowsize = init_display(stdscr)
+	data = query_twitch("topgames", 0)
 	while key != ord('q'):
 		if windowsize[0] > 8 and windowsize[1] > 30:
 			win_l.clear()
