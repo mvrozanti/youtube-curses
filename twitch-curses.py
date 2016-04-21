@@ -12,6 +12,8 @@ curses.curs_set(0)
 query_limit = "75"
 highlight = 0
 page = 0
+hl_cache = 0
+p_cache = 0
 state = "top"
 q = ["source", "high", "medium", "low", "mobile", "audio"]
 quality = 0
@@ -55,6 +57,7 @@ def query_twitch(query, search):
 try:
 	windowsize = init_display(stdscr)
 	data = query_twitch("topgames", 0)
+	cache = data
 	while key != ord('q'):
 		if windowsize[0] > 8 and windowsize[1] > 30:
 			win_l.clear()
@@ -141,15 +144,17 @@ try:
 				query = [currentpage[highlight]['game']['name'], 0]
 				data = query_twitch(query[0], query[1])
 				state = "search"
+				hl_cache = highlight
+				p_cache = page
 				highlight = 0
 				page = 0
 		elif key == curses.KEY_LEFT:
 			if state != "top":
 				init_display(stdscr)
-				data = query_twitch("topgames", 0)
+				data = cache
 				state = "top"
-				highlight = 0
-				page = 0
+				highlight = hl_cache
+				page = p_cache
 		elif key == ord('+') and quality > 0:
 			quality -= 1
 		elif key == ord('-') and quality < 5:
@@ -174,6 +179,7 @@ try:
 			elif state == "top":
 				init_display(stdscr)
 				data = query_twitch("topgames", 0)
+				cache = data
 			highlight = 0
 			page = 0
 		elif key == curses.KEY_RESIZE:
