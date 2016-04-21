@@ -186,6 +186,8 @@ try:
 			page = 0
 		elif key == curses.KEY_RESIZE:
 			windowsize = init_display(stdscr)
+			hl_cache = 0
+			p_cache = 0
 			highlight = 0
 			page = 0
 finally:
