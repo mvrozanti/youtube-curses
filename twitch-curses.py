@@ -93,6 +93,7 @@ try:
 							win_r.addnstr(2, 3, str(i['game']), maxlen)
 							win_r.addnstr(4, 3, "Viewers: "+str(i['viewers']), maxlen)
 							win_r.addstr(5, 3, "Status:")
+							win_r.addstr(windowsize[0]-5, windowsize[1]//2-9, "back: b")
 							status = textwrap.wrap(str(i['channel']['status']), windowsize[1]//2-6)
 							l_num = 7
 							for line in status:
@@ -149,7 +150,7 @@ try:
 				p_cache = page
 				highlight = 0
 				page = 0
-		elif key == curses.KEY_LEFT:
+		elif key == curses.KEY_LEFT or key == ord('b'):
 			if state != "top":
 				init_display(stdscr)
 				data = cache
