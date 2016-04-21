@@ -133,6 +133,7 @@ try:
 			if state == "search":
 				curses.nocbreak(); stdscr.keypad(0); curses.echo()
 				curses.endwin()
+				print("[twitch-curses]", currentpage[highlight]['channel']['display_name'], "-", currentpage[highlight]['channel']['status'], "(", currentpage[highlight]['viewers'], "viewers )")
 				print("[twitch-curses] Launching livestreamer")
 				subprocess.call(["livestreamer", currentpage[highlight]['channel']['url'], q[quality]+",best"])
 				stdscr = curses.initscr()
