@@ -58,7 +58,7 @@ try:
 	windowsize = init_display(stdscr)
 	data = query_twitch("topgames", 0)
 	cache = data
-	while key != ord('q'):
+	while key != ord('q') and key != ord('Q'):
 		if windowsize[0] > 8 and windowsize[1] > 30:
 			win_l.clear()
 			win_l.border(0)
@@ -150,7 +150,7 @@ try:
 				p_cache = page
 				highlight = 0
 				page = 0
-		elif key == curses.KEY_LEFT or key == ord('b'):
+		elif key == curses.KEY_LEFT or key == ord('b') or key == ord('B'):
 			if state != "top":
 				init_display(stdscr)
 				data = cache
@@ -161,7 +161,7 @@ try:
 			quality -= 1
 		elif key == ord('-') and quality < 5:
 			quality += 1
-		elif key == ord('s'):
+		elif key == ord('s') or key == ord('S'):
 			searchbox = curses.newwin(3, windowsize[1]-4, windowsize[0]//2-1, 2)
 			searchbox.border(0)
 			searchbox.addnstr(0, 3, "Search for streams", windowsize[0]-4)
@@ -174,7 +174,7 @@ try:
 			state = "search"
 			highlight = 0
 			page = 0
-		elif key == ord('r'):
+		elif key == ord('r') or key == ord('R'):
 			if state == "search":
 				init_display(stdscr)
 				data = query_twitch(query[0], query[1])
