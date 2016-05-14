@@ -141,8 +141,9 @@ try:
 				curses.noecho()
 				curses.cbreak()
 				stdscr.keypad(1)
+				windowsize = init_display(stdscr)
 			elif state == "top":
-				init_display(stdscr)
+				windowsize = init_display(stdscr)
 				query = [currentpage[highlight]['game']['name'], 0]
 				data = query_twitch(query[0], query[1])
 				state = "search"
@@ -152,7 +153,7 @@ try:
 				page = 0
 		elif key == curses.KEY_LEFT or key == ord('b') or key == ord('B'):
 			if state != "top":
-				init_display(stdscr)
+				windowsize = init_display(stdscr)
 				data = cache
 				state = "top"
 				highlight = hl_cache
@@ -168,7 +169,7 @@ try:
 			searchbox.refresh()
 			curses.echo()
 			s = searchbox.getstr(1,1, windowsize[1]-6)
-			init_display(stdscr)
+			windowsize = init_display(stdscr)
 			query = [s.decode("utf-8"), 1]
 			data = query_twitch(query[0], query[1])
 			state = "search"
@@ -176,10 +177,10 @@ try:
 			page = 0
 		elif key == ord('r') or key == ord('R'):
 			if state == "search":
-				init_display(stdscr)
+				windowsize = init_display(stdscr)
 				data = query_twitch(query[0], query[1])
 			elif state == "top":
-				init_display(stdscr)
+				windowsize = init_display(stdscr)
 				data = query_twitch("topgames", 0)
 				cache = data
 			highlight = 0
