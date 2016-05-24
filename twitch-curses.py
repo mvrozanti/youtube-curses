@@ -60,9 +60,9 @@ try:
 	cache = data
 	while key != ord('q') and key != ord('Q'):
 		if windowsize[0] > 8 and windowsize[1] > 30:
-			win_l.clear()
+			win_l.erase()
 			win_l.border(0)
-			win_r.clear()
+			win_r.erase()
 			win_r.border(0)
 			win_l.addstr(windowsize[0]-1, windowsize[1]//2-9, "page:"+str(page+1))
 			win_r.addstr(windowsize[0]-4, windowsize[1]//2-11, "search: s")
@@ -111,14 +111,14 @@ try:
 			stdscr.addstr(0,0,"Terminal")
 			stdscr.addstr(1,0,"too small")
 		key = stdscr.getch()
-		if key == curses.KEY_DOWN:
+		if key == curses.KEY_DOWN or key == ord('j'):
 			if highlight + page * maxitems + 1 < totalitems:
 				if highlight + 1 == maxitems:
 					page += 1
 					highlight = 0
 				else:
 					highlight += 1
-		elif key == curses.KEY_UP:
+		elif key == curses.KEY_UP or key == ord('k'):
 			if highlight == 0 and page > 0:
 				page -= 1
 				highlight = maxitems - 1
@@ -130,7 +130,7 @@ try:
 		elif key == curses.KEY_PPAGE and page > 0:
 			highlight = 0
 			page -= 1
-		elif key == curses.KEY_RIGHT or key == 10:
+		elif key == curses.KEY_RIGHT or key == 10 or key == ord('l'):
 			if state == "search":
 				curses.nocbreak(); stdscr.keypad(0); curses.echo()
 				curses.endwin()
@@ -151,7 +151,7 @@ try:
 				p_cache = page
 				highlight = 0
 				page = 0
-		elif key == curses.KEY_LEFT or key == ord('b') or key == ord('B'):
+		elif key == curses.KEY_LEFT or key == ord('b') or key == ord('B') or key == ord('h'):
 			if state != "top":
 				windowsize = init_display(stdscr)
 				data = cache
