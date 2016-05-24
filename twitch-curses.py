@@ -18,6 +18,7 @@ state = "top"
 q = ["source", "high", "medium", "low", "mobile", "audio"]
 quality = 0
 key = 0
+donothing = False
 
 def init_display(stdscr): 
 	global maxlen
@@ -59,7 +60,13 @@ try:
 	data = query_twitch("topgames", 0)
 	cache = data
 	while key != ord('q') and key != ord('Q'):
-		if windowsize[0] > 8 and windowsize[1] > 30:
+		if windowsize[0] < 10 or windowsize[1] < 32:
+			stdscr.clear()
+			stdscr.addstr(0,0,"Terminal")
+			stdscr.addstr(1,0,"too small")
+		elif donothing == True:
+			donothing = False
+		else:
 			win_l.erase()
 			win_l.border(0)
 			win_r.erase()
@@ -106,10 +113,6 @@ try:
 					index += 1
 			win_l.refresh()
 			win_r.refresh()
-		else:
-			stdscr.clear()
-			stdscr.addstr(0,0,"Terminal")
-			stdscr.addstr(1,0,"too small")
 		key = stdscr.getch()
 		if key == curses.KEY_DOWN or key == ord('j'):
 			if highlight + page * maxitems + 1 < totalitems:
@@ -191,6 +194,8 @@ try:
 			p_cache = 0
 			highlight = 0
 			page = 0
+		else:
+			donothing = True
 finally:
 	curses.nocbreak(); stdscr.keypad(0); curses.echo()
 	curses.endwin()
