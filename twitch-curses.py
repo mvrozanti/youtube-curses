@@ -48,6 +48,7 @@ def query_twitch(query, search):
 	buf = BytesIO()
 	c = pycurl.Curl()
 	c.setopt(c.URL, url)
+	c.setopt(c.HTTPHEADER, ['Client-ID: caozjg12y6hjop39wx996mxn585yqyk'])
 	c.setopt(c.WRITEDATA, buf)
 	c.perform()
 	c.close()
