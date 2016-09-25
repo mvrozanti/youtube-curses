@@ -148,7 +148,7 @@ try:
 						break
 					if selected_stream == "":
 						selected_stream = "best"
-					ls_exit_code = subprocess.call(["livestreamer", currentpage[highlight]['channel']['url'], selected_stream])
+					ls_exit_code = subprocess.call(["livestreamer", "--http-header", "Client-ID=caozjg12y6hjop39wx996mxn585yqyk", currentpage[highlight]['channel']['url'], selected_stream])
 				stdscr = curses.initscr()
 				curses.noecho()
 				curses.cbreak()
