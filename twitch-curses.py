@@ -174,7 +174,7 @@ try:
 			quality -= 1
 		elif key == ord('-') and quality < 5:
 			quality += 1
-		elif key == ord('s') or key == ord('S'):
+		elif key == ord('s') or key == ord('S') or key == ord('/'):
 			searchbox = curses.newwin(3, windowsize[1]-4, windowsize[0]//2-1, 2)
 			searchbox.border(0)
 			searchbox.addnstr(0, 3, "Search for streams", windowsize[0]-4)
