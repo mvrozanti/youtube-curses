@@ -138,7 +138,9 @@ try:
 			if state == "search":
 				curses.nocbreak(); stdscr.keypad(0); curses.echo()
 				curses.endwin()
+				chat_url = "http://www.twitch.tv/"+currentpage[highlight]['channel']['display_name']+"/chat"
 				print("[twitch-curses]", currentpage[highlight]['channel']['display_name'], "-", currentpage[highlight]['channel']['status'], "(", currentpage[highlight]['viewers'], "viewers )")
+				print("[twitch-curses] Chat url:", chat_url)
 				print("[twitch-curses] Launching livestreamer")
 				ls_exit_code = subprocess.call(["livestreamer", "--http-header", "Client-ID=caozjg12y6hjop39wx996mxn585yqyk", currentpage[highlight]['channel']['url'], q[quality]])
 				while ls_exit_code != 0:
