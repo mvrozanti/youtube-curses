@@ -141,16 +141,16 @@ try:
 				chat_url = "http://www.twitch.tv/"+currentpage[highlight]['channel']['display_name']+"/chat"
 				print("[twitch-curses]", currentpage[highlight]['channel']['display_name'], "-", currentpage[highlight]['channel']['status'], "(", currentpage[highlight]['viewers'], "viewers )")
 				print("[twitch-curses] Chat url:", chat_url)
-				print("[twitch-curses] Launching livestreamer")
-				ls_exit_code = subprocess.call(["livestreamer", "--http-header", "Client-ID=caozjg12y6hjop39wx996mxn585yqyk", currentpage[highlight]['channel']['url'], q[quality]])
+				print("[twitch-curses] Launching streamlink")
+				ls_exit_code = subprocess.call(["streamlink", "--http-header", "Client-ID=caozjg12y6hjop39wx996mxn585yqyk", currentpage[highlight]['channel']['url'], q[quality]])
 				while ls_exit_code != 0:
-					print("\n[twitch-curses] Livestreamer returned an error. This usually means that the selected stream quality is not available. If that is the case, then you can now choose one of the available streams printed above (defaults to 'best' if left empty). Or you can type 'A' to abort.")
+					print("\n[twitch-curses] Streamlink returned an error. This usually means that the selected stream quality is not available. If that is the case, then you can now choose one of the available streams printed above (defaults to 'best' if left empty). Or you can type 'A' to abort.")
 					selected_stream = input("Stream to open [best]: ")
 					if selected_stream == "A" or selected_stream == "a":
 						break
 					if selected_stream == "":
 						selected_stream = "best"
-					ls_exit_code = subprocess.call(["livestreamer", "--http-header", "Client-ID=caozjg12y6hjop39wx996mxn585yqyk", currentpage[highlight]['channel']['url'], selected_stream])
+					ls_exit_code = subprocess.call(["streamlink", "--http-header", "Client-ID=caozjg12y6hjop39wx996mxn585yqyk", currentpage[highlight]['channel']['url'], selected_stream])
 				stdscr = curses.initscr()
 				curses.noecho()
 				curses.cbreak()
