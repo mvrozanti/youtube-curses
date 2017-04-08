@@ -183,6 +183,9 @@ try:
 			searchbox.refresh()
 			curses.echo()
 			s = searchbox.getstr(1,1, windowsize[1]-6)
+			while not s:
+				searchbox.addnstr(0, 3, "Please enter a valid search query!", windowsize[0] + 6)
+				s = searchbox.getstr(1, 1, windowsize[1] - 6)
 			windowsize = init_display(stdscr)
 			query = [s.decode("utf-8"), 1]
 			data = query_twitch(query[0], query[1])
