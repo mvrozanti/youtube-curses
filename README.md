@@ -1,6 +1,6 @@
 # twitch-curses
 
-This is a simple twitch.tv browser / livestreamer frontend made with python and ncurses that I hacked together one day. Maybe someone will find it useful.
+This is a simple twitch.tv browser / streamlink frontend made with python and ncurses that I hacked together one day. Maybe someone will find it useful.
 
 The controls should be pretty straightforward.
 
