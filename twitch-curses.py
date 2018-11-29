@@ -20,6 +20,8 @@ quality = 0
 key = 0
 donothing = False
 
+client_id = 'Client-ID: bq8fm1e83axjhj8wj3ies1fdjz6v3d'
+
 def init_display(stdscr): 
 	global maxlen
 	global win_l
@@ -48,7 +50,7 @@ def query_twitch(query, search):
 	buf = BytesIO()
 	c = pycurl.Curl()
 	c.setopt(c.URL, url)
-	c.setopt(c.HTTPHEADER, ['Client-ID: caozjg12y6hjop39wx996mxn585yqyk'])
+	c.setopt(c.HTTPHEADER, [client_id])
 	c.setopt(c.WRITEDATA, buf)
 	c.perform()
 	c.close()
@@ -142,7 +144,7 @@ try:
 				print("[twitch-curses]", currentpage[highlight]['channel']['display_name'], "-", currentpage[highlight]['channel']['status'], "(", currentpage[highlight]['viewers'], "viewers )")
 				print("[twitch-curses] Chat url:", chat_url)
 				print("[twitch-curses] Launching streamlink")
-				ls_exit_code = subprocess.call(["streamlink", "--http-header", "Client-ID=caozjg12y6hjop39wx996mxn585yqyk", currentpage[highlight]['channel']['url'], q[quality]])
+				ls_exit_code = subprocess.call(["streamlink", "--http-header", client_id, currentpage[highlight]['channel']['url'], q[quality]])
 				while ls_exit_code != 0:
 					print("\n[twitch-curses] Streamlink returned an error. This usually means that the selected stream quality is not available. If that is the case, then you can now choose one of the available streams printed above (defaults to 'best' if left empty). Or you can type 'A' to abort.")
 					selected_stream = input("Stream to open [best]: ")
@@ -150,7 +152,7 @@ try:
 						break
 					if selected_stream == "":
 						selected_stream = "best"
-					ls_exit_code = subprocess.call(["streamlink", "--http-header", "Client-ID=caozjg12y6hjop39wx996mxn585yqyk", currentpage[highlight]['channel']['url'], selected_stream])
+					ls_exit_code = subprocess.call(["streamlink", "--http-header", client_id, currentpage[highlight]['channel']['url'], selected_stream])
 				stdscr = curses.initscr()
 				curses.noecho()
 				curses.cbreak()
