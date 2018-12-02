@@ -1,8 +1,8 @@
-# twitch-curses
+# youtube-curses
 
-![Usage](https://i.imgur.com/nnIgkVr.gif)
+[](![Usage](https://i.imgur.com/nnIgkVr.gif))
 
-This is a simple twitch.tv browser / streamlink frontend made with python and ncurses that I hacked together one day. Maybe someone will find it useful.
+This is a simple youtube browser / streamlink frontend made with python and ncurses inspired by [twitch-curses](https://github.com/mvrozanti/twitch-curses). Maybe someone will find it useful.
 
 The controls should be pretty straightforward.
 
