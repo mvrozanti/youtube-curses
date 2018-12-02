@@ -41,12 +41,12 @@ def init_display(stdscr):
 def query_youtube(query, search):
         if search:
                 query = urllib.parse.quote(query)
-                url = "https://api.youtube.tv/kraken/search/streams?limit="+query_limit+"&q="+query
-        elif query == "topgames":
-                url = "https://api.youtube.tv/kraken/games/top?limit="+query_limit
+                url = 'https://api.youtube.tv/kraken/search/streams?limit='+query_limit+"&q="+query
+        elif query == 'topgames':
+                url = 'https://api.youtube.tv/kraken/games/top?limit='+query_limit
         else:
                 query = urllib.parse.quote(query)
-                url = "https://api.youtube.tv/kraken/streams?limit="+query_limit+"&game="+query
+                url = 'https://api.youtube.tv/kraken/streams?limit='+query_limit+"&game="+query
         buf = BytesIO()
         c = pycurl.Curl()
         c.setopt(c.URL, url)
@@ -60,7 +60,7 @@ def query_youtube(query, search):
 
 try:
         windowsize = init_display(stdscr)
-        data = query_youtube("topgames", 0)
+        data = query_youtube('topgames', 0)
         cache = data
         while key != ord('q') and key != ord('Q'):
                 if windowsize[0] < 10 or windowsize[1] < 32:

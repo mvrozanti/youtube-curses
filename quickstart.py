@@ -23,9 +23,10 @@ API_VERSION = 'v3'
 def get_authenticated_service():
   flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
   credentials = flow.run_console()
-  return build(API_SERVICE_NAME, API_VERSION, credentials = credentials)
+  return build(API_SERVICE_NAME, API_VERSION, refresh_token = "REFRESH_TOKEN", credentials = credentials)
 
 def channels_list_by_username(service, **kwargs):
+  code.interact(local=locals())
   results = service.channels().list(
     **kwargs
   ).execute()
