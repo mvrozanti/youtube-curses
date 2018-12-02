@@ -2,7 +2,7 @@
 import curses, json, pycurl, subprocess, textwrap, urllib.parse
 from io import BytesIO
 
-print("[twitch-curses] Initializing")
+print("[youtube-curses] Initializing")
 stdscr = curses.initscr()
 curses.noecho()
 curses.cbreak()
@@ -22,7 +22,7 @@ donothing = False
 
 client_id = 'Client-ID: bq8fm1e83axjhj8wj3ies1fdjz6v3d'
 
-def init_display(stdscr): 
+def init_display(stdscr):
         global maxlen
         global win_l
         global win_r
@@ -38,15 +38,15 @@ def init_display(stdscr):
         win_r = curses.newwin(size[0], size[1] // 2, 0, size[1] // 2)
         return size
 
-def query_twitch(query, search):
+def query_youtube(query, search):
         if search:
                 query = urllib.parse.quote(query)
-                url = "https://api.twitch.tv/kraken/search/streams?limit="+query_limit+"&q="+query
+                url = "https://api.youtube.tv/kraken/search/streams?limit="+query_limit+"&q="+query
         elif query == "topgames":
-                url = "https://api.twitch.tv/kraken/games/top?limit="+query_limit
+                url = "https://api.youtube.tv/kraken/games/top?limit="+query_limit
         else:
                 query = urllib.parse.quote(query)
-                url = "https://api.twitch.tv/kraken/streams?limit="+query_limit+"&game="+query
+                url = "https://api.youtube.tv/kraken/streams?limit="+query_limit+"&game="+query
         buf = BytesIO()
         c = pycurl.Curl()
         c.setopt(c.URL, url)
@@ -60,7 +60,7 @@ def query_twitch(query, search):
 
 try:
         windowsize = init_display(stdscr)
-        data = query_twitch("topgames", 0)
+        data = query_youtube("topgames", 0)
         cache = data
         while key != ord('q') and key != ord('Q'):
                 if windowsize[0] < 10 or windowsize[1] < 32:
@@ -140,13 +140,13 @@ try:
                         if state == "search":
                                 curses.nocbreak(); stdscr.keypad(0); curses.echo()
                                 curses.endwin()
-                                chat_url = "http://www.twitch.tv/"+currentpage[highlight]['channel']['display_name']+"/chat"
-                                print("[twitch-curses]", currentpage[highlight]['channel']['display_name'], "-", currentpage[highlight]['channel']['status'], "(", currentpage[highlight]['viewers'], "viewers )")
-                                print("[twitch-curses] Chat url:", chat_url)
-                                print("[twitch-curses] Launching streamlink")
+                                chat_url = "http://www.youtube.tv/"+currentpage[highlight]['channel']['display_name']+"/chat"
+                                print("[youtube-curses]", currentpage[highlight]['channel']['display_name'], "-", currentpage[highlight]['channel']['status'], "(", currentpage[highlight]['viewers'], "viewers )")
+                                print("[youtube-curses] Chat url:", chat_url)
+                                print("[youtube-curses] Launching streamlink")
                                 ls_exit_code = subprocess.call(["streamlink", "--http-header", client_id.replace(': ', '='), currentpage[highlight]['channel']['url'], q[quality]])
                                 while ls_exit_code != 0:
-                                        print("\n[twitch-curses] Streamlink returned an error. This usually means that the selected stream quality is not available. If that is the case, then you can now choose one of the available streams printed above (defaults to 'best' if left empty). Or you can type 'A' to abort.")
+                                        print("\n[youtube-curses] Streamlink returned an error. This usually means that the selected stream quality is not available. If that is the case, then you can now choose one of the available streams printed above (defaults to 'best' if left empty). Or you can type 'A' to abort.")
                                         selected_stream = input("Stream to open [best]: ")
                                         if selected_stream == "A" or selected_stream == "a":
                                                 break
@@ -161,7 +161,7 @@ try:
                         elif state == "top":
                                 windowsize = init_display(stdscr)
                                 query = [currentpage[highlight]['game']['name'], 0]
-                                data = query_twitch(query[0], query[1])
+                                data = query_youtube(query[0], query[1])
                                 state = "search"
                                 hl_cache = highlight
                                 p_cache = page
@@ -190,17 +190,17 @@ try:
                                 s = searchbox.getstr(1, 1, windowsize[1] - 6)
                         windowsize = init_display(stdscr)
                         query = [s.decode("utf-8"), 1]
-                        data = query_twitch(query[0], query[1])
+                        data = query_youtube(query[0], query[1])
                         state = "search"
                         highlight = 0
                         page = 0
                 elif key == ord('r') or key == ord('R'):
                         if state == "search":
                                 windowsize = init_display(stdscr)
-                                data = query_twitch(query[0], query[1])
+                                data = query_youtube(query[0], query[1])
                         elif state == "top":
                                 windowsize = init_display(stdscr)
-                                data = query_twitch("topgames", 0)
+                                data = query_youtube("topgames", 0)
                                 cache = data
                         highlight = 0
                         page = 0
@@ -215,4 +215,4 @@ try:
 finally:
         curses.nocbreak(); stdscr.keypad(0); curses.echo()
         curses.endwin()
-        print("[twitch-curses] Exiting")
+        print("[youtube-curses] Exiting")
