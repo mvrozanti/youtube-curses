@@ -17,13 +17,10 @@ This is a simple youtube browser / streamlink frontend made with python and ncur
 
 ## Todo
 
-[X] List subscriptions
-
-[ ] Search for content (prompt user)
-
-[ ] Get "recommended videos" (how tho?)
-
-[ ] [ranger](https://github.com/ranger/ranger)-like thumbnail preview
+- [X] List subscriptions
+- [ ] Search for content (prompt user)
+- [ ] Get "recommended videos" (how tho?)
+- [ ] [ranger](https://github.com/ranger/ranger)-like thumbnail preview
 
 ## License
 
