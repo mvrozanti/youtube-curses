@@ -8,7 +8,7 @@ This is a simple youtube browser / streamlink frontend made with python and ncur
 
 # Requirements
 
-- install streamlink
+- install [streamlink](https://github.com/streamlink/streamlink)
   - `sudo pacman -S streamlink` on Arch
   - optionally create `~/.streamlinkrc` file
 - install requirements with `pip install --user -r requirements.txt`
@@ -21,7 +21,7 @@ This is a simple youtube browser / streamlink frontend made with python and ncur
 - [ ] Search for content (prompt user)
 - [ ] Get "recommended videos" (how tho?)
 - [ ] Configurable keymap
-- [ ] Logfile argument
+- [X] Logfile argument
 - [ ] [ranger](https://github.com/ranger/ranger)-like thumbnail preview
 - [ ] Show comment section
 - [ ] Hotkey to go to channel

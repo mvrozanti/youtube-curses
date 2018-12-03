@@ -23,7 +23,6 @@ def init_display(stdscr):
     win_r = curses.newwin(size[0], size[1] // 2, 0, size[1] // 2)
     return size
 
-
 def main(args):
     # todo: parse args
     highlight = 0
@@ -52,18 +51,17 @@ def main(args):
                 stdscr.clear()
                 stdscr.addstr(0,0,"Terminal")
                 stdscr.addstr(1,0,"too small")
-            elif donothing == True:
-                donothing = False
+            elif donothing == True: donothing = False
             else:
                 win_l.erase()
                 win_l.border(0)
                 win_r.erase()
                 win_r.border(0)
-                win_r.addstr(windowsize[0]-5, windowsize[1]//2-20, "open in browser: o") # to be done
+                win_r.addstr(windowsize[0]-5, windowsize[1]//2-20, "open in browser: o") # to be implemented
                 win_r.addstr(windowsize[0]-4, windowsize[1]//2-11, "search: s")
                 win_r.addstr(windowsize[0]-3, windowsize[1]//2-11, "refresh: r")
-                win_r.addstr(windowsize[0]-1, windowsize[1]//2-9, "quit: q")
-                win_l.addstr(windowsize[0]-1, windowsize[1]//2-9, "page: "+str(page+1))
+                win_r.addstr(windowsize[0]-1, windowsize[1]//2-9,  "quit: q")
+                win_l.addstr(windowsize[0]-1, windowsize[1]//2-9,  "page: "+str(page+1))
                 index = 0
                 if state == "top":
                     totalitems = len(data)
@@ -203,4 +201,5 @@ if __name__ == '__main__':
     parser.add_argument('-q', '--quality',       metavar='N',        default=0,          help='initial video quality [0=best,5=worst]'     )
     parser.add_argument('-l', '--logfile',       metavar='LOCATION', default=sys.stdout, help='default=stdout'                             )
     args = parser.parse_args()
+    if args.logfile != sys.stdout: sys.stdout = open(args.logfile)
     main(args)
