@@ -6,6 +6,12 @@ This is a simple youtube browser / streamlink frontend made with python and ncur
 
 The controls should be pretty straightforward.
 
+
+## Todo
+[ ] List subscriptions
+[ ] Search for content (prompt user)
+[ ] Get "recommended videos" (how tho?)
+
 ## License
 
 [WTFPL](https://gitlab.com/corbie/twitch-curses/blob/master/LICENSE)
