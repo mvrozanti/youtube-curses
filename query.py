@@ -43,17 +43,17 @@ def channels_list_by_username(service, **kwargs):
                 results['items'][0]['snippet']['title'],
                 results['items'][0]['statistics']['viewCount']))
 
-def get_front_page():
+def get_front_page(ccount, vcount):
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     service = get_authenticated_service()
-    subs_dict = service.subscriptions().list(part='id,snippet', maxResults=5, mine=True).execute()
+    subs_dict = service.subscriptions().list(part='id,snippet', maxResults=ccount, mine=True).execute()
     subs = subs_dict['items'][1:]
     front_page = OrderedDict()
     for i in subs:
         channel_snippet = i['snippet']
         channel_id = channel_snippet['resourceId']['channelId']
         channel_title = channel_snippet['title']
-        response = service.search().list(part='snippet', maxResults=5, channelId=channel_id, order='date', type='').execute()
+        response = service.search().list(part='snippet', maxResults=vcount, channelId=channel_id, order='date', type='').execute()
         channel_vids = []
         for cv in response['items']:
             try:

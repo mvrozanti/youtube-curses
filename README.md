@@ -15,12 +15,17 @@ This is a simple youtube browser / streamlink frontend made with python and ncur
 - [follow this guide to get your credentials](https://developers.google.com/youtube/v3/getting-started)
   - don't forget to download your client_secret.json
 
-## Todo
+## Features
 
 - [X] List subscriptions
 - [ ] Search for content (prompt user)
 - [ ] Get "recommended videos" (how tho?)
+- [ ] Configurable keymap
+- [ ] Logfile argument
 - [ ] [ranger](https://github.com/ranger/ranger)-like thumbnail preview
+- [ ] Show comment section
+- [ ] Hotkey to go to channel
+- [ ] Publish on PyPi
 
 ## License
 

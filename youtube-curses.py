@@ -5,6 +5,7 @@ from query import *
 import itertools
 import code
 import argparse
+import sys
 
 def init_display(stdscr):
     global maxlen
@@ -44,7 +45,7 @@ def main(args):
 
     try:
         windowsize = init_display(stdscr)
-        data = get_front_page()
+        data = get_front_page(args.channel_count, args.video_count)
         cache = data
         while key != ord('q') and key != ord('Q'):
             if windowsize[0] < 10 or windowsize[1] < 32:
@@ -58,7 +59,6 @@ def main(args):
                 win_l.border(0)
                 win_r.erase()
                 win_r.border(0)
-#                 win_l.addstr(windowsize[0]-1, windowsize[1]//2-23, "highlight:"+str(highlight+1))
                 win_r.addstr(windowsize[0]-5, windowsize[1]//2-20, "open in browser: o") # to be done
                 win_r.addstr(windowsize[0]-4, windowsize[1]//2-11, "search: s")
                 win_r.addstr(windowsize[0]-3, windowsize[1]//2-11, "refresh: r")
@@ -68,17 +68,19 @@ def main(args):
                 if state == "top":
                     totalitems = len(data)
                     currentpage = list(data.keys())[maxitems*page:maxitems*(page+1)]
-                    for channel_title in currentpage:
-                        if index < maxitems:
-                            if index == highlight:
-                                win_l.addnstr(index*2+2, 2, channel_title, maxlen, curses.A_REVERSE)
-                                vids = data[channel_title]
-                                for ix,v in enumerate(vids):
-                                    vid_link = v['lnk']
-                                    vid_title = v['ttl']
-                                    win_r.addnstr(5+ix, 2, vid_title, maxlen)
-                            else: win_l.addnstr(index*2+2, 2, channel_title, maxlen)
-                        index += 1
+                    try:
+                        for channel_title in currentpage:
+                            if index < maxitems:
+                                if index == highlight:
+                                    win_l.addnstr(index*2+2, 2, channel_title, maxlen, curses.A_REVERSE)
+                                    vids = data[channel_title]
+                                    for ix,v in enumerate(vids):
+                                        vid_link = v['lnk']
+                                        vid_title = v['ttl']
+                                        win_r.addnstr(5+ix, 2, vid_title, maxlen)
+                                else: win_l.addnstr(index*2+2, 2, channel_title, maxlen)
+                            index += 1
+                    except Exception as e: print(e)
                 if state == "search":
                     currentpage_vids = data[list(data)[hl_cache]]
                     totalitems = len(currentpage_vids)
@@ -196,8 +198,9 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('-c', '--channel-count', type=int, metavar='N', default=50, help='max channels to be queried')
-    parser.add_argument('-C', '--video-count',   type=int, metavar='N', default=50, help='video count to be queried')
-    parser.add_argument('-q', '--quality',            metavar='N', default=50, help='initial video quality ')
+    parser.add_argument('-c', '--channel-count', metavar='N',        default=10,         help='max channels to be queried',             type=int)
+    parser.add_argument('-C', '--video-count',   metavar='N',        default=10,         help='video count to be queried',              type=int)
+    parser.add_argument('-q', '--quality',       metavar='N',        default=0,          help='initial video quality [0=best,5=worst]'     )
+    parser.add_argument('-l', '--logfile',       metavar='LOCATION', default=sys.stdout, help='default=stdout'                             )
     args = parser.parse_args()
     main(args)
