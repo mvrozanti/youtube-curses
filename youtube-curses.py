@@ -57,7 +57,7 @@ def main(args):
                 win_l.border(0)
                 win_r.erase()
                 win_r.border(0)
-                win_r.addstr(windowsize[0]-5, windowsize[1]//2-20, "open in browser: o") # to be implemented
+#                 win_r.addstr(windowsize[0]-5, windowsize[1]//2-20, "open in browser: o") # to be implemented
                 win_r.addstr(windowsize[0]-4, windowsize[1]//2-11, "search: s")
                 win_r.addstr(windowsize[0]-3, windowsize[1]//2-11, "refresh: r")
                 win_r.addstr(windowsize[0]-1, windowsize[1]//2-9,  "quit: q")
@@ -72,17 +72,17 @@ def main(args):
                                 if index == highlight:
                                     win_l.addnstr(index*2+2, 2, channel_title, maxlen, curses.A_REVERSE)
                                     vids = data[channel_title]
-                                    for ix,v in enumerate(vids):
+                                    for v_ix,v in enumerate(vids):
                                         vid_link = v['lnk']
                                         vid_title = v['ttl']
-                                        win_r.addnstr(5+ix, 2, vid_title, maxlen)
+                                        win_r.addnstr(v_ix*2+2, 2, vid_title, maxlen)
                                 else: win_l.addnstr(index*2+2, 2, channel_title, maxlen)
                             index += 1
                     except Exception as e: print(e)
                 if state == "search":
                     currentpage_vids = data[list(data)[hl_cache]]
                     totalitems = len(currentpage_vids)
-                    for ix,vid in enumerate(currentpage_vids):
+                    for v_ix,vid in enumerate(currentpage_vids):
                         vid_title = vid['ttl']
                         vid_link = vid['lnk']
                         if index < maxitems:
@@ -90,6 +90,7 @@ def main(args):
                                 win_l.addnstr(index*2+2, 2, vid_title, maxlen, curses.A_REVERSE)
                             else: win_l.addnstr(index*2+2, 2, vid_title, maxlen)
                         index += 1
+                    win_r.addnstr(6, 2, 'something will appear here!', maxlen)
                 win_l.refresh()
                 win_r.refresh()
             key = stdscr.getch()

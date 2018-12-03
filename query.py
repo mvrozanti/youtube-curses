@@ -65,5 +65,3 @@ def get_front_page(ccount, vcount):
         front_page[channel_title] = channel_vids
     return front_page
 #     print(json.dumps(front_page, indent=4))
-
-if __name__ == '__main__': get_front_page()
