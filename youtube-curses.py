@@ -75,22 +75,22 @@ try:
                             for ix,v in enumerate(vids):
                                 vid_link = v['lnk']
                                 vid_title = v['ttl']
-                                win_r.addnstr(5+ix, 3, vid_title, maxlen)
+                                win_r.addnstr(5+ix, 2, vid_title, maxlen)
                         else: win_l.addnstr(index*2+2, 2, channel_title, maxlen)
                     index += 1
             if state == "search":
                 totalitems = len(data)
                 currentpage_vids = data[list(data)[hl_cache]]
 #                 curses.endwin() or code.interact(local=locals())
-                for vid in currentpage_vids:
+                for ix,vid in enumerate(currentpage_vids):
                     vid_title = vid['ttl']
                     vid_link = vid['lnk']
                     if index < maxitems:
-                        win_r.addnstr(2+index, 3, vid_title, maxlen)
-                        win_r.addnstr(4+index, 3, vid_link, maxlen)
-                        if index == highlight: win_l.addnstr(index*2+2, 2, list(data.keys())[hl_cache], maxlen, curses.A_REVERSE)
-                        else: win_l.addnstr(index*2+2, 2, "EOP", maxlen)
-#                     index += 1
+#                         win_l.addnstr(ix+1, 3, vid_title, maxlen)
+#                         win_r.addnstr(4+index, 3, vid_link, maxlen)
+                        if index == highlight: win_l.addnstr(index*2+2, 2, vid_title, maxlen, curses.A_REVERSE)
+                        else: win_l.addnstr(index*2+2, 2, vid_title, maxlen)
+                        index += 1
             win_l.refresh()
             win_r.refresh()
         key = stdscr.getch()
@@ -112,27 +112,23 @@ try:
             highlight = 0
             page -= 1
         elif key == curses.KEY_RIGHT or key == 10 or key == ord('l'):
-#             if state == "search":
-#                 curses.nocbreak(); stdscr.keypad(0); curses.echo()
-#                 curses.endwin()
-#                 chat_url = "http://www.youtube.tv/"+currentpage[highlight]['channel']['display_name']+"/chat"
-#                 print("[youtube-curses]", currentpage[highlight]['channel']['display_name'], "-", currentpage[highlight]['channel']['status'], "(", currentpage[highlight]['viewers'], "viewers )")
-#                 print("[youtube-curses] Chat url:", chat_url)
-#                 print("[youtube-curses] Launching streamlink")
-#                 ls_exit_code = subprocess.call(["streamlink", "--http-header", client_id.replace(': ', '='), currentpage[highlight]['channel']['url'], q[quality]])
-#                 while ls_exit_code != 0:
-#                     print("\n[youtube-curses] Streamlink returned an error. This usually means that the selected stream quality is not available. If that is the case, then you can now choose one of the available streams printed above (defaults to 'best' if left empty). Or you can type 'A' to abort.")
-#                     selected_stream = input("Stream to open [best]: ")
-#                     if selected_stream == "A" or selected_stream == "a":
-#                         break
-#                     if selected_stream == "":
-#                         selected_stream = "best"
-#                     ls_exit_code = subprocess.call(["streamlink", "--http-header", client_id.replace(': ', '='), currentpage[highlight]['channel']['url'], selected_stream])
-#                 stdscr = curses.initscr()
-#                 curses.noecho()
-#                 curses.cbreak()
-#                 stdscr.keypad(1)
-#                 windowsize = init_display(stdscr)
+            if state == "search":
+                curses.nocbreak(); stdscr.keypad(0); curses.echo()
+                curses.endwin()
+                url = data[currentpage[hl_cache]][highlight]['lnk']
+                print("[youtube-curses] Launching streamlink")
+                ls_exit_code = subprocess.call(["streamlink", url, q[0]])
+                while ls_exit_code != 0:
+                    print("\n[youtube-curses] Streamlink returned an error. This usually means that the selected stream quality is not available. If that is the case, then you can now choose one of the available streams printed above (defaults to 'best' if left empty). Or you can type 'A' to abort.")
+                    selected_stream = input("Stream to open [best]: ")
+                    if selected_stream == "A" or selected_stream == "a": break
+                    if selected_stream == "": selected_stream = "best"
+                    ls_exit_code = subprocess.call(["streamlink", url, selected_stream])
+                stdscr = curses.initscr()
+                curses.noecho()
+                curses.cbreak()
+                stdscr.keypad(1)
+                windowsize = init_display(stdscr)
             if state == "top":
                 windowsize = init_display(stdscr)
                 state = "search"
