@@ -196,7 +196,8 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('-c', '--channel-count', type=int, metavar='N', default=50, help='set max channels to be queried')
-    parser.add_argument('-C', '--video-count',   type=int, metavar='N', default=50, help='set max channels to be queried')
+    parser.add_argument('-c', '--channel-count', type=int, metavar='N', default=50, help='max channels to be queried')
+    parser.add_argument('-C', '--video-count',   type=int, metavar='N', default=50, help='video count to be queried')
+    parser.add_argument('-q', '--quality',            metavar='N', default=50, help='initial video quality ')
     args = parser.parse_args()
     main(args)
