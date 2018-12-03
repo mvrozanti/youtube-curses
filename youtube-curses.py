@@ -22,6 +22,7 @@ quality = 0
 key = 0
 donothing = False
 
+
 def init_display(stdscr):
     global maxlen
     global win_l
@@ -54,6 +55,7 @@ try:
             win_l.border(0)
             win_r.erase()
             win_r.border(0)
+            win_l.addstr(windowsize[0]-1, windowsize[1]//2-23, "highlight:"+str(highlight+1))
             win_l.addstr(windowsize[0]-1, windowsize[1]//2-9, "page:"+str(page+1))
             win_r.addstr(windowsize[0]-4, windowsize[1]//2-11, "search: s")
             win_r.addstr(windowsize[0]-3, windowsize[1]//2-12, "refresh: r")
@@ -61,8 +63,11 @@ try:
             index = 0
             if state == "top":
                 totalitems = len(data)
-                currentpage = dict(itertools.islice(dict(itertools.islice(data.items(), maxitems*page)), maxitems*(page+1)))
-                for channel_title, vids in data.items():
+#                 pre_slice = dict(itertools.islice(data.items(), maxitems*page))
+#                 currentpage = dict(itertools.islice(pre_slice.items(), maxitems*(page+1)))
+#                 curses.endwin() or code.interact(local=locals())
+                currentpage = list(data.keys())[maxitems*page:maxitems*(page+1)]
+                for channel_title in currentpage:
                     if index < maxitems:
                         if index == highlight:
                             win_l.addnstr(index*2+2, 2, channel_title, maxlen, curses.A_REVERSE)
@@ -74,27 +79,17 @@ try:
                         else: win_l.addnstr(index*2+2, 2, channel_title, maxlen)
                     index += 1
             if state == "search":
-                totalitems = len(data['streams'])
-                currentpage = data.keys()[maxitems*page:maxitems*(page+1)]
-                for i in currentpage:
+                totalitems = len(data)
+                currentpage_vids = data[list(data)[hl_cache]]
+#                 curses.endwin() or code.interact(local=locals())
+                for vid in currentpage_vids:
+                    vid_title = vid['ttl']
+                    vid_link = vid['lnk']
                     if index < maxitems:
-                        if index == highlight:
-                            win_l.addnstr(index*2+2, 2, str(i['channel']['display_name']), maxlen, curses.A_REVERSE)
-                            win_r.addnstr(windowsize[0]-3, 2, "quality: +-", maxlen)
-                            win_r.addnstr(windowsize[0]-2, 3, q[quality], maxlen)
-                            win_r.addnstr(2, 3, str(i['game']), maxlen)
-                            win_r.addnstr(4, 3, "Viewers: "+str(i['viewers']), maxlen)
-                            win_r.addstr(5, 3, "Status:")
-                            win_r.addstr(windowsize[0]-5, windowsize[1]//2-9, "back: b")
-                            status = textwrap.wrap(str(i['channel']['status']), windowsize[1]//2-6)
-                            l_num = 7
-                            for line in status:
-                                if l_num >= windowsize[0] - 4:
-                                    break
-                                win_r.addstr(l_num, 4, line)
-                                l_num += 1
-                        else:
-                            win_l.addnstr(index*2+2, 2, str(i['channel']['display_name']), maxlen)
+                        win_r.addnstr(2+index, 3, vid_title, maxlen)
+                        win_r.addnstr(4+index, 3, vid_link, maxlen)
+                        if index == highlight: win_l.addnstr(index*2+2, 2, list(data.keys())[hl_cache], maxlen, curses.A_REVERSE)
+                        else: win_l.addnstr(index*2+2, 2, "EOP", maxlen)
 #                     index += 1
             win_l.refresh()
             win_r.refresh()
@@ -140,7 +135,6 @@ try:
 #                 windowsize = init_display(stdscr)
             if state == "top":
                 windowsize = init_display(stdscr)
-                data = get_front_page()
                 state = "search"
                 hl_cache = highlight
                 p_cache = page

@@ -6,6 +6,7 @@ import code
 import json
 import pickle
 import threading
+from collections import OrderedDict
 import google.oauth2.credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -45,9 +46,9 @@ def channels_list_by_username(service, **kwargs):
 def get_front_page():
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     service = get_authenticated_service()
-    subs_dict = service.subscriptions().list(part='id,snippet', maxResults=50, mine=True).execute()
+    subs_dict = service.subscriptions().list(part='id,snippet', maxResults=5, mine=True).execute()
     subs = subs_dict['items'][1:]
-    front_page = {}
+    front_page = OrderedDict()
     for i in subs:
         channel_snippet = i['snippet']
         channel_id = channel_snippet['resourceId']['channelId']
