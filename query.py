@@ -31,9 +31,15 @@ def get_authenticated_service():
         credentials = flow.run_local_server()
         with open('credentials.dat', 'wb') as credentials_dat: pickle.dump(credentials, credentials_dat)
     else:
-        with open('credentials.dat', 'rb') as credentials_dat: credentials = pickle.load(credentials_dat)
-    if credentials.expired: credentials.refresh(Request())
-#     credentials = flow.run_console()
+        print('!!')
+        with open('credentials.dat', 'rb') as credentials_dat:
+            credentials = pickle.load(credentials_dat)
+            if credentials.expired:
+                print('Credentials expired. Refreshing...')
+                credentials.refresh(Request())
+                print('Credentials refreshed.')
+        with open('credentials.dat', 'wb') as credentials_dat: pickle.dump(credentials, credentials_dat)
+    print('!!!')
     return build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
 def channels_list_by_username(service, **kwargs):
@@ -45,7 +51,9 @@ def channels_list_by_username(service, **kwargs):
 
 def get_front_page(ccount, vcount):
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    print('!')
     service = get_authenticated_service()
+    print('Authenticated')
     subs_dict = service.subscriptions().list(part='id,snippet', maxResults=ccount, mine=True).execute()
     subs = subs_dict['items'][1:]
     front_page = OrderedDict()

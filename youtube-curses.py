@@ -44,6 +44,7 @@ def main(args):
 
     try:
         windowsize = init_display(stdscr)
+        curses.endwin()
         data = get_front_page(args.channel_count, args.video_count)
         cache = data
         while key != ord('q') and key != ord('Q'):
@@ -188,6 +189,7 @@ def main(args):
                 p_cache = 0
                 highlight = 0
                 page = 0
+
             else:
                 donothing = True
     finally:
@@ -202,5 +204,5 @@ if __name__ == '__main__':
     parser.add_argument('-q', '--quality',       metavar='N',        default=0,          help='initial video quality [0=best,5=worst]'     )
     parser.add_argument('-l', '--logfile',       metavar='LOCATION', default=sys.stdout, help='default=stdout'                             )
     args = parser.parse_args()
-    if args.logfile != sys.stdout: sys.stdout = open(args.logfile)
+    if args.logfile != sys.stdout: sys.stderr = sys.stdout = open(args.logfile, 'w')
     main(args)
