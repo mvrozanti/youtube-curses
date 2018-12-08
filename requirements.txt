@@ -1,6 +1,5 @@
-google-api-python-client
+pycurl
 google-auth
 google-auth-oauthlib
 google-auth-httplib2
-curses
-pycurl
+google-api-python-client

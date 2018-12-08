@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 import curses, json, pycurl, subprocess, textwrap, urllib.parse
+from subprocess import check_output
 from io import BytesIO
-from query import *
 import itertools
-import code
+from query import *
 import argparse
+import code
 import sys
 
 def init_display(stdscr):
@@ -44,7 +45,7 @@ def main(args):
 
     try:
         windowsize = init_display(stdscr)
-        curses.endwin()
+        print('Querying...')
         data = get_front_page(args.channel_count, args.video_count)
         cache = data
         while key != ord('q') and key != ord('Q'):
@@ -198,11 +199,14 @@ def main(args):
         print("[youtube-curses] Exiting")
 
 if __name__ == '__main__':
+    devnull = open(os.devnull, 'w')
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('-c', '--channel-count', metavar='N',        default=10,         help='max channels to be queried',             type=int)
-    parser.add_argument('-C', '--video-count',   metavar='N',        default=10,         help='video count to be queried',              type=int)
-    parser.add_argument('-q', '--quality',       metavar='N',        default=0,          help='initial video quality [0=best,5=worst]'     )
-    parser.add_argument('-l', '--logfile',       metavar='LOCATION', default=sys.stdout, help='default=stdout'                             )
+    parser.add_argument('-c', '--channel-count', metavar='N',        default=10,      help='max channels to be queried',             type=int)
+    parser.add_argument('-C', '--video-count',   metavar='N',        default=10,      help='video count to be queried',              type=int)
+    parser.add_argument('-q', '--quality',       metavar='N',        default=0,       help='initial video quality [0=best,5=worst]'     )
+    parser.add_argument('-l', '--logfile',       metavar='LOCATION', default=devnull, help='default=cross-platform /dev/null'           )
+#     out = check_output(['./quickstart.js'])
+#     code.interact(local=locals())
     args = parser.parse_args()
-    if args.logfile != sys.stdout: sys.stderr = sys.stdout = open(args.logfile, 'w')
+    sys.stderr = sys.stdout = devnull if args.logfile == devnull else open(args.logfile, 'w')
     main(args)

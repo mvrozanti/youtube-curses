@@ -10,6 +10,10 @@ This is a simple youtube browser / streamlink frontend made with python and ncur
 - install [streamlink](https://github.com/streamlink/streamlink)
   - `sudo pacman -S streamlink` on Arch
   - optionally create `~/.streamlinkrc` file
+- instal node_modules
+  - npm install googleapis --save
+  - npm install google-auth-library --save
+  - npm install argparse --save
 - install requirements with `pip install --user -r requirements.txt`
 - [follow this guide to get your credentials](https://developers.google.com/youtube/v3/getting-started)
   - don't forget to download your `client_secret.json`

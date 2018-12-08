@@ -2,6 +2,7 @@
 # Sample Python code for user authorization
 
 import os
+import sys
 import code
 import json
 import pickle
@@ -26,21 +27,33 @@ API_VERSION = 'v3'
 
 def get_authenticated_service():
     if not os.path.exists('credentials.dat'):
+        print('Creating flow from %s' % CLIENT_SECRETS_FILE)
         flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
+        print('Flow created. Getting authorization url...')
         authorization_url, state = flow.authorization_url(access_type='offline', include_granted_scopes='true')
+        print('Authorized')
         credentials = flow.run_local_server()
+        print('Persisting credentials')
         with open('credentials.dat', 'wb') as credentials_dat: pickle.dump(credentials, credentials_dat)
     else:
-        print('!!')
+        refreshed = False
         with open('credentials.dat', 'rb') as credentials_dat:
             credentials = pickle.load(credentials_dat)
             if credentials.expired:
                 print('Credentials expired. Refreshing...')
                 credentials.refresh(Request())
                 print('Credentials refreshed.')
-        with open('credentials.dat', 'wb') as credentials_dat: pickle.dump(credentials, credentials_dat)
-    print('!!!')
-    return build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
+            refreshed = not credentials.expired
+        if refreshed:
+            with open('credentials.dat', 'wb') as credentials_dat:
+                pickle.dump(credentials, credentials_dat)
+        else:
+            print('Could not refresh credentials')
+            sys.exit(1)
+    print('Building service %s %s...' % (API_SERVICE_NAME, API_VERSION))
+    service = build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
+    print('Done.')
+    return service
 
 def channels_list_by_username(service, **kwargs):
     results = service.channels().list(**kwargs).execute()
@@ -51,9 +64,7 @@ def channels_list_by_username(service, **kwargs):
 
 def get_front_page(ccount, vcount):
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-    print('!')
     service = get_authenticated_service()
-    print('Authenticated')
     subs_dict = service.subscriptions().list(part='id,snippet', maxResults=ccount, mine=True).execute()
     subs = subs_dict['items'][1:]
     front_page = OrderedDict()
@@ -73,3 +84,5 @@ def get_front_page(ccount, vcount):
         front_page[channel_title] = channel_vids
     return front_page
 #     print(json.dumps(front_page, indent=4))
+
+if __name__ == '__main__': get_front_page(1,1)
