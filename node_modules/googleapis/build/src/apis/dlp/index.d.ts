@@ -1,0 +1,6 @@
+import { dlp_v2 } from './v2';
+export declare const VERSIONS: {
+    'v2': typeof dlp_v2.Dlp;
+};
+export declare function dlp(version: 'v2'): dlp_v2.Dlp;
+export declare function dlp(options: dlp_v2.Options): dlp_v2.Dlp;

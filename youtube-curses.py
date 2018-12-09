@@ -1,11 +1,17 @@
 #!/usr/bin/env python
 import curses, json, pycurl, subprocess, textwrap, urllib.parse
+import os
 from io import BytesIO
 from query import *
 import itertools
+import threading
 import code
 import argparse
 import sys
+import logging
+from img_display import W3MImageDisplayer
+
+log = logging.getLogger()
 
 def init_display(stdscr):
     global maxlen
@@ -25,6 +31,8 @@ def init_display(stdscr):
 
 def main(args):
     # todo: parse args
+    w3mid = W3MImageDisplayer()
+    w3mid.start()
     highlight = 0
     page = 0
     hl_cache = 0
@@ -44,7 +52,6 @@ def main(args):
 
     try:
         windowsize = init_display(stdscr)
-        curses.endwin()
         data = get_front_page(args.channel_count, args.video_count)
         cache = data
         while key != ord('q') and key != ord('Q'):
@@ -79,19 +86,25 @@ def main(args):
                                         win_r.addnstr(v_ix*2+2, 2, vid_title, maxlen)
                                 else: win_l.addnstr(index*2+2, 2, channel_title, maxlen)
                             index += 1
-                    except Exception as e: print(e)
+                    except Exception as e: log.exception(e)
                 if state == "search":
                     currentpage_vids = data[list(data)[hl_cache]]
                     totalitems = len(currentpage_vids)
                     for v_ix,vid in enumerate(currentpage_vids):
                         vid_title = vid['ttl']
                         vid_link = vid['lnk']
+                        tf = vid['tf']
                         if index < maxitems:
                             if index == highlight:
+                                w3mid.quit()
+                                w3mid = W3MImageDisplayer()
+#                                 w3mid.path_queue.put(tf)
+                                w3mid.set_params(tf, windowsize[1] - 60, 1, 999, 999)
+                                w3mid.start()
                                 win_l.addnstr(index*2+2, 2, vid_title, maxlen, curses.A_REVERSE)
+                                win_r.addnstr(20, 2, 'something will appear here!', maxlen)
                             else: win_l.addnstr(index*2+2, 2, vid_title, maxlen)
                         index += 1
-                    win_r.addnstr(6, 2, 'something will appear here!', maxlen)
                 win_l.refresh()
                 win_r.refresh()
             key = stdscr.getch()
@@ -151,9 +164,15 @@ def main(args):
                     highlight = hl_cache
                     page = p_cache
 
-            elif key == ord('+') and quality > 0: quality -= 1
+            elif key == ord('+'):
+                quality += 1
+                log.debug('Quality:' + str(quality))
+                log.debug('windowsize:' + str(windowsize))
 
-            elif key == ord('-') and quality < 5: quality += 1
+            elif key == ord('-'):
+                quality -= 1
+                log.debug('Quality:' + str(quality))
+                log.debug('windowsize:' + str(windowsize))
 
 #         elif key == ord('s') or key == ord('S') or key == ord('/'):
 #             searchbox = curses.newwin(3, windowsize[1]-4, windowsize[0]//2-1, 2)
@@ -184,6 +203,11 @@ def main(args):
 #             page = 0
 
             elif key == curses.KEY_RESIZE:
+                curses.endwin()
+                stdscr = curses.initscr()
+                curses.noecho()
+                curses.cbreak()
+                stdscr.keypad(1)
                 windowsize = init_display(stdscr)
                 hl_cache = 0
                 p_cache = 0
@@ -192,17 +216,19 @@ def main(args):
 
             else:
                 donothing = True
+    except Exception as e: log.exception(e)
     finally:
         curses.nocbreak(); stdscr.keypad(0); curses.echo()
         curses.endwin()
         print("[youtube-curses] Exiting")
+        os._exit(0)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-c', '--channel-count', metavar='N',        default=10,         help='max channels to be queried',             type=int)
     parser.add_argument('-C', '--video-count',   metavar='N',        default=10,         help='video count to be queried',              type=int)
     parser.add_argument('-q', '--quality',       metavar='N',        default=0,          help='initial video quality [0=best,5=worst]'     )
-    parser.add_argument('-l', '--logfile',       metavar='LOCATION', default=sys.stdout, help='default=stdout'                             )
+    parser.add_argument('-l', '--logfile',       metavar='LOCATION', default=None,          help='default=None'                             )
     args = parser.parse_args()
-    if args.logfile != sys.stdout: sys.stderr = sys.stdout = open(args.logfile, 'w')
+    if args.logfile: logging.basicConfig(filename=args.logfile, level=logging.DEBUG)
     main(args)

@@ -1,0 +1,6 @@
+import { servicemanagement_v1 } from './v1';
+export declare const VERSIONS: {
+    'v1': typeof servicemanagement_v1.Servicemanagement;
+};
+export declare function servicemanagement(version: 'v1'): servicemanagement_v1.Servicemanagement;
+export declare function servicemanagement(options: servicemanagement_v1.Options): servicemanagement_v1.Servicemanagement;

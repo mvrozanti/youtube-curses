@@ -1,0 +1,6 @@
+import { androidenterprise_v1 } from './v1';
+export declare const VERSIONS: {
+    'v1': typeof androidenterprise_v1.Androidenterprise;
+};
+export declare function androidenterprise(version: 'v1'): androidenterprise_v1.Androidenterprise;
+export declare function androidenterprise(options: androidenterprise_v1.Options): androidenterprise_v1.Androidenterprise;

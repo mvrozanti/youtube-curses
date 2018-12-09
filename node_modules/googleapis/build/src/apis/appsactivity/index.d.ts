@@ -1,0 +1,6 @@
+import { appsactivity_v1 } from './v1';
+export declare const VERSIONS: {
+    'v1': typeof appsactivity_v1.Appsactivity;
+};
+export declare function appsactivity(version: 'v1'): appsactivity_v1.Appsactivity;
+export declare function appsactivity(options: appsactivity_v1.Options): appsactivity_v1.Appsactivity;

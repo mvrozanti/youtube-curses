@@ -1,0 +1,6 @@
+import { civicinfo_v2 } from './v2';
+export declare const VERSIONS: {
+    'v2': typeof civicinfo_v2.Civicinfo;
+};
+export declare function civicinfo(version: 'v2'): civicinfo_v2.Civicinfo;
+export declare function civicinfo(options: civicinfo_v2.Options): civicinfo_v2.Civicinfo;

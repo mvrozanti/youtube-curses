@@ -4,7 +4,10 @@
 import os
 import code
 import json
+import urllib3
 import pickle
+import logging
+import tempfile
 import threading
 from collections import OrderedDict
 import google.oauth2.credentials
@@ -17,12 +20,14 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 # the OAuth 2.0 information for this application, including its client_id and
 # client_secret.
 CLIENT_SECRETS_FILE = "client_secret.json"
-
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # annoying as fok
 # This OAuth 2.0 access scope allows for full read/write access to the
 # authenticated user's account and requires requests to use an SSL connection.
 SCOPES = ['https://www.googleapis.com/auth/youtube.force-ssl']
 API_SERVICE_NAME = 'youtube'
 API_VERSION = 'v3'
+
+log = logging.getLogger()
 
 def get_authenticated_service():
     if not os.path.exists('credentials.dat'):
@@ -31,15 +36,13 @@ def get_authenticated_service():
         credentials = flow.run_local_server()
         with open('credentials.dat', 'wb') as credentials_dat: pickle.dump(credentials, credentials_dat)
     else:
-        print('!!')
         with open('credentials.dat', 'rb') as credentials_dat:
             credentials = pickle.load(credentials_dat)
             if credentials.expired:
-                print('Credentials expired. Refreshing...')
+#                 print('Credentials expired. Refreshing...')
                 credentials.refresh(Request())
                 print('Credentials refreshed.')
         with open('credentials.dat', 'wb') as credentials_dat: pickle.dump(credentials, credentials_dat)
-    print('!!!')
     return build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
 def channels_list_by_username(service, **kwargs):
@@ -51,25 +54,39 @@ def channels_list_by_username(service, **kwargs):
 
 def get_front_page(ccount, vcount):
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-    print('!')
     service = get_authenticated_service()
-    print('Authenticated')
+    log.debug('Authenticated')
     subs_dict = service.subscriptions().list(part='id,snippet', maxResults=ccount, mine=True).execute()
-    subs = subs_dict['items'][1:]
+    subs = subs_dict['items']
     front_page = OrderedDict()
-    for i in subs:
+    http = urllib3.PoolManager()
+    for sub_ix,i in enumerate(subs):
         channel_snippet = i['snippet']
         channel_id = channel_snippet['resourceId']['channelId']
         channel_title = channel_snippet['title']
         response = service.search().list(part='snippet', maxResults=vcount, channelId=channel_id, order='date', type='').execute()
         channel_vids = []
-        for cv in response['items']:
+        img_download_threads = []
+        for vid_ix,cv in enumerate(response['items']):
             try:
-                vid_link = 'https://youtube.com/watch?v=' + cv['id']['videoId']
-                vid_snippet = cv['snippet']
-                vid_title = vid_snippet['title']
-                channel_vids.append({'lnk': vid_link, 'ttl': vid_title})
-            except: pass
+                if 'videoId' in cv['id']:
+                    vid_link = 'https://youtube.com/watch?v=' + cv['id']['videoId']
+                    def download_image(tf, url):
+                        tf.write(http.request('GET', url, preload_content=False).read())
+                        tf.close()
+                    tf = tempfile.NamedTemporaryFile(delete=False)
+                    vid_snippet = cv['snippet']
+                    img_url = vid_snippet['thumbnails']['high']['url']
+                    vid_title = vid_snippet['title']
+                    channel_vids.append({'lnk': vid_link, 'ttl': vid_title, 'tf': tf.name})
+                    img_download_threads.append(threading.Thread(target=download_image, args=[tf,img_url]))
+#             except: pass
+            except: raise
+        for t in img_download_threads: t.start()
         front_page[channel_title] = channel_vids
     return front_page
-#     print(json.dumps(front_page, indent=4))
+
+if __name__ == '__main__':
+    front_page = get_front_page(5,5)
+    print(json.dumps(front_page, indent=4))
+

@@ -1,0 +1,6 @@
+import { siteVerification_v1 } from './v1';
+export declare const VERSIONS: {
+    'v1': typeof siteVerification_v1.Siteverification;
+};
+export declare function siteVerification(version: 'v1'): siteVerification_v1.Siteverification;
+export declare function siteVerification(options: siteVerification_v1.Options): siteVerification_v1.Siteverification;

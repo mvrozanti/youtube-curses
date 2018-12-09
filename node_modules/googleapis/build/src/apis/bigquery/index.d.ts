@@ -1,0 +1,6 @@
+import { bigquery_v2 } from './v2';
+export declare const VERSIONS: {
+    'v2': typeof bigquery_v2.Bigquery;
+};
+export declare function bigquery(version: 'v2'): bigquery_v2.Bigquery;
+export declare function bigquery(options: bigquery_v2.Options): bigquery_v2.Bigquery;

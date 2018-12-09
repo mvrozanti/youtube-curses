@@ -22,7 +22,8 @@ This is a simple youtube browser / streamlink frontend made with python and ncur
 - [ ] Change sorting order
 - [ ] Configurable keymap
 - [X] Logfile argument
-- [ ] [ranger](https://github.com/ranger/ranger)-like thumbnail preview
+- [X] [ranger](https://github.com/ranger/ranger)-like thumbnail preview
+  - [ ] needs testing
 - [ ] Show comment section
 - [ ] Hotkey to go to channel
 - [ ] Published on PyPi

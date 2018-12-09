@@ -1,0 +1,6 @@
+import { bigquerydatatransfer_v1 } from './v1';
+export declare const VERSIONS: {
+    'v1': typeof bigquerydatatransfer_v1.Bigquerydatatransfer;
+};
+export declare function bigquerydatatransfer(version: 'v1'): bigquerydatatransfer_v1.Bigquerydatatransfer;
+export declare function bigquerydatatransfer(options: bigquerydatatransfer_v1.Options): bigquerydatatransfer_v1.Bigquerydatatransfer;

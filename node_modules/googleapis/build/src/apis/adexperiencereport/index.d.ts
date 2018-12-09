@@ -1,0 +1,6 @@
+import { adexperiencereport_v1 } from './v1';
+export declare const VERSIONS: {
+    'v1': typeof adexperiencereport_v1.Adexperiencereport;
+};
+export declare function adexperiencereport(version: 'v1'): adexperiencereport_v1.Adexperiencereport;
+export declare function adexperiencereport(options: adexperiencereport_v1.Options): adexperiencereport_v1.Adexperiencereport;

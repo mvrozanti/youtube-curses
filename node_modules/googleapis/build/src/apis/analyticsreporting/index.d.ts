@@ -1,0 +1,6 @@
+import { analyticsreporting_v4 } from './v4';
+export declare const VERSIONS: {
+    'v4': typeof analyticsreporting_v4.Analyticsreporting;
+};
+export declare function analyticsreporting(version: 'v4'): analyticsreporting_v4.Analyticsreporting;
+export declare function analyticsreporting(options: analyticsreporting_v4.Options): analyticsreporting_v4.Analyticsreporting;
