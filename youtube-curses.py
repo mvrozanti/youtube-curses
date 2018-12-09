@@ -98,7 +98,6 @@ def main(args):
                             if index == highlight:
                                 w3mid.quit()
                                 w3mid = W3MImageDisplayer()
-#                                 w3mid.path_queue.put(tf)
                                 w3mid.set_params(tf, windowsize[1] - 60, 1, 999, 999)
                                 w3mid.start()
                                 win_l.addnstr(index*2+2, 2, vid_title, maxlen, curses.A_REVERSE)
