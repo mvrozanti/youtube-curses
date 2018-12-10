@@ -23,7 +23,7 @@ CLIENT_SECRETS_FILE = "client_secret.json"
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # annoying as fok
 # This OAuth 2.0 access scope allows for full read/write access to the
 # authenticated user's account and requires requests to use an SSL connection.
-SCOPES = ['https://www.googleapis.com/auth/youtube.force-ssl']
+SCOPES = ['https://www.googleapis.com/auth/youtube.readonly', 'https://www.googleapis.com/auth/youtube', 'https://www.googleapis.com/auth/youtube.force-ssl']
 API_SERVICE_NAME = 'youtube'
 API_VERSION = 'v3'
 
@@ -86,7 +86,19 @@ def get_front_page(ccount, vcount):
         front_page[channel_title] = channel_vids
     return front_page
 
+def get_home_page():
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    service = get_authenticated_service()
+    log.debug('Authenticated')
+    subs_dict = service.activities().list(part='snippet', maxResults=25, home=True,).execute()
+    code.interact(local=locals())
+    return subs_dict
+
+
 if __name__ == '__main__':
-    front_page = get_front_page(5,5)
-    print(json.dumps(front_page, indent=4))
+#     front_page = get_front_page(5,5)
+#     print(json.dumps(front_page, indent=4))
+    home_page = get_home_page()
+    print(json.dumps(home_page, indent=4))
+
 
