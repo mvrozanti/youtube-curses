@@ -55,6 +55,8 @@ This is a simple youtube browser / streamlink frontend made with python and ncur
   - [ ] Report
   - [ ] Save as (watch later/favorites/existing playlist/new playlist)
   - [ ] Share link (at current time or not)
+- [ ] Cached elements / internal database (?) for faster bootup
+  - [ ] Video information such as thumbnails, channel, link and title
 - [ ] Published on PyPi
 
 ## License
