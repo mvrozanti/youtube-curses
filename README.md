@@ -5,15 +5,6 @@
 ![Usage](https://i.imgur.com/ZDmzrQA.gif)
 This is a simple youtube browser / streamlink frontend made with python and ncurses inspired by [twitch-curses](https://github.com/mvrozanti/twitch-curses).
 
-# Requirements
-
-- install [streamlink](https://github.com/streamlink/streamlink)
-  - `sudo pacman -S streamlink` on Arch
-  - optionally create `~/.streamlinkrc` file
-- install requirements with `pip install --user -r requirements.txt`
-- [follow this guide to get your credentials](https://developers.google.com/youtube/v3/getting-started)
-  - don't forget to download your `client_secret.json`
-
 ## Features
 
 - [ ] Download with `youtube-dl`
@@ -58,6 +49,15 @@ This is a simple youtube browser / streamlink frontend made with python and ncur
 - [ ] Cached elements / internal database (?) for faster bootup
   - [ ] Video information such as thumbnails, channel, link and title
 - [ ] Published on PyPi
+
+# Requirements
+
+- install [streamlink](https://github.com/streamlink/streamlink)
+  - `sudo pacman -S streamlink` on Arch
+  - optionally create `~/.streamlinkrc` file
+- install requirements with `pip install --user -r requirements.txt`
+- [follow this guide to get your credentials](https://developers.google.com/youtube/v3/getting-started)
+  - don't forget to download your `client_secret.json`
 
 ## License
 
