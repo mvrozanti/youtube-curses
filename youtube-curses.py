@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.6
 import curses, json, pycurl, subprocess, textwrap, urllib.parse
 import os
 from io import BytesIO
@@ -12,6 +12,10 @@ import logging
 from img_display import W3MImageDisplayer
 
 log = logging.getLogger()
+log.propagate = False
+
+q = ['best', '720p', '480p', '360p', 'worst', 'audio_only']
+quality = 0
 
 def init_display(stdscr):
     global maxlen
@@ -24,22 +28,38 @@ def init_display(stdscr):
     stdscr.move(0,0)
     stdscr.refresh()
     maxlen = size[1] // 2 - 4
-    maxitems = size[0] // 2 - 1
+    maxitems = size[0] // 2 - 3
     win_l = curses.newwin(size[0], size[1] // 2, 0, 0)
     win_r = curses.newwin(size[0], size[1] // 2, 0, size[1] // 2)
     return size
 
+def prompt(msg):
+    searchbox = curses.newwin(3, windowsize[1]-4, windowsize[0]//2-1, 2)
+    searchbox.border(0)
+    searchbox.addnstr(0, 3, msg, windowsize[0]-4)
+    searchbox.refresh()
+    curses.echo()
+    s = searchbox.getstr(1,1, windowsize[1]-6)
+    while not s:
+        searchbox.addnstr(0, 3, "Please enter a valid search query!", windowsize[0] + 6)
+        s = searchbox.getstr(1, 1, windowsize[1] - 6)
+    return s.decode("utf-8")
+
+def streamlink(url):
+    url += '?disable_polymer=1'
+    ls_exit_code = 1
+    while ls_exit_code != 0: ls_exit_code = subprocess.call(["streamlink", url, q[quality]], stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
+
 def main(args):
+    global windowsize
     # todo: parse args
     w3mid = W3MImageDisplayer()
-    w3mid.start()
+#     w3mid.start()
     highlight = 0
     page = 0
     hl_cache = 0
     p_cache = 0
     state = "top"
-    q = ["best", "720p", "480p", "360p", "worst", "audio_only"]
-    quality = 0
     key = 0
     donothing = False
 
@@ -70,6 +90,11 @@ def main(args):
                 win_r.addstr(windowsize[0]-3, windowsize[1]//2-11, "refresh: r")
                 win_r.addstr(windowsize[0]-1, windowsize[1]//2-9,  "quit: q")
                 win_l.addstr(windowsize[0]-1, windowsize[1]//2-9,  "page: "+str(page+1))
+                win_l.addstr(windowsize[0]-1, windowsize[1]//2-23, "highlight "+str(highlight))
+                win_l.addstr(windowsize[0]-1, windowsize[1]//2-38, "maxitems "+str(maxitems))
+                try: win_l.addstr(windowsize[0]-1, windowsize[1]//2-46, "totalitems "+str(totalitems))
+                except: pass
+#                 win_l.addstr(windowsize[0]-1, windowsize[1]//2-37, "totalitems "+str(totalitems))
                 index = 0
                 if state == "top":
                     totalitems = len(data)
@@ -83,14 +108,14 @@ def main(args):
                                     for v_ix,v in enumerate(vids):
                                         vid_link = v['lnk']
                                         vid_title = v['ttl']
-                                        win_r.addnstr(v_ix*2+2, 2, vid_title, maxlen)
+                                        win_r.addnstr(v_ix*2+4, 2, vid_title, maxlen)
                                 else: win_l.addnstr(index*2+2, 2, channel_title, maxlen)
                             index += 1
                     except Exception as e: log.exception(e)
                 if state == "search":
                     currentpage_vids = data[list(data)[hl_cache]]
                     totalitems = len(currentpage_vids)
-                    for v_ix,vid in enumerate(currentpage_vids):
+                    for v_ix,vid in enumerate(currentpage_vids[maxitems*page:maxitems*(page+1)]):
                         vid_title = vid['ttl']
                         vid_link = vid['lnk']
                         tf = vid['tf']
@@ -98,7 +123,7 @@ def main(args):
                             if index == highlight:
                                 w3mid.quit()
                                 w3mid = W3MImageDisplayer()
-                                w3mid.set_params(tf, windowsize[1] - 60, 1, 999, 999)
+                                w3mid.set_params(tf, windowsize[1] - windowsize[1]/3, 1, windowsize[1], windowsize[0])
                                 w3mid.start()
                                 win_l.addnstr(index*2+2, 2, vid_title, maxlen, curses.A_REVERSE)
                                 win_r.addnstr(20, 2, 'something will appear here!', maxlen)
@@ -121,32 +146,14 @@ def main(args):
                     highlight = maxitems - 1
                 elif highlight > 0: highlight -= 1
 
-            elif key == curses.KEY_NPAGE and totalitems > (page+1) * maxitems:
-                highlight = 0
-                page += 1
+            elif key == curses.KEY_NPAGE and totalitems > (page+1) * maxitems: page += 1
 
-            elif key == curses.KEY_PPAGE and page > 0:
-                highlight = 0
-                page -= 1
+            elif key == curses.KEY_PPAGE and page > 0: page -= 1
 
             elif key == curses.KEY_RIGHT or key == 10 or key == ord('l'):
                 if state == "search":
-                    curses.nocbreak(); stdscr.keypad(0); curses.echo()
-                    curses.endwin()
                     url = data[currentpage[hl_cache]][highlight]['lnk']
-                    print("[youtube-curses] Launching streamlink")
-                    ls_exit_code = subprocess.call(["streamlink", url, q[quality]])
-                    while ls_exit_code != 0:
-                        print("\n[youtube-curses] Streamlink returned an error. This usually means that the selected stream quality is not available. If that is the case, then you can now choose one of the available streams printed above (defaults to 'best' if left empty). Or you can type 'A' to abort.")
-                        selected_stream = input("Stream to open [best]: ")
-                        if selected_stream == "A" or selected_stream == "a": break
-                        if selected_stream == "": selected_stream = "best"
-                        ls_exit_code = subprocess.call(["streamlink", url, selected_stream])
-                    stdscr = curses.initscr()
-                    curses.noecho()
-                    curses.cbreak()
-                    stdscr.keypad(1)
-                    windowsize = init_display(stdscr)
+                    threading.Thread(target=streamlink, args=[url]).start()
                 if state == "top":
                     windowsize = init_display(stdscr)
                     state = "search"
@@ -154,6 +161,10 @@ def main(args):
                     p_cache = page
                     highlight = 0
                     page = 0
+
+            elif key == curses.KEY_LEFT or key == ord('G'):
+                page = maxitems % totalitems
+                highlight = maxitems
 
             elif key == curses.KEY_LEFT or key == ord('b') or key == ord('B') or key == ord('h'):
                 if state != "top":
@@ -173,22 +184,13 @@ def main(args):
                 log.debug('Quality:' + str(quality))
                 log.debug('windowsize:' + str(windowsize))
 
-#         elif key == ord('s') or key == ord('S') or key == ord('/'):
-#             searchbox = curses.newwin(3, windowsize[1]-4, windowsize[0]//2-1, 2)
-#             searchbox.border(0)
-#             searchbox.addnstr(0, 3, "Search for streams", windowsize[0]-4)
-#             searchbox.refresh()
-#             curses.echo()
-#             s = searchbox.getstr(1,1, windowsize[1]-6)
-#             while not s:
-#                 searchbox.addnstr(0, 3, "Please enter a valid search query!", windowsize[0] + 6)
-#                 s = searchbox.getstr(1, 1, windowsize[1] - 6)
-#             windowsize = init_display(stdscr)
-#             query = [s.decode("utf-8"), 1]
-#             data = query_youtube(query[0], query[1])
-#             state = "search"
-#             highlight = 0
-#             page = 0
+            elif key == ord('s') or key == ord('S') or key == ord('/'):
+                windowsize = init_display(stdscr)
+                query = prompt('Search for streams')
+                data = search(query, part='snippet')
+                state = 'search'
+                highlight = 0
+                page = 0
 
 #         elif key == ord('r') or key == ord('R'):
 #             if state == "search":
@@ -219,7 +221,7 @@ def main(args):
     finally:
         curses.nocbreak(); stdscr.keypad(0); curses.echo()
         curses.endwin()
-        print("[youtube-curses] Exiting")
+        print('[youtube-curses] Exiting')
         os._exit(0)
 
 if __name__ == '__main__':

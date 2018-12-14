@@ -21,6 +21,7 @@ This is a simple youtube browser / streamlink frontend made with python and ncur
 - [ ] Show video/channel category
 - [ ] Change subscription state of selected channel or video's channel
 - [ ] Configurable keymap
+- [ ] Credentials argument
 - [X] Logfile argument
 - [X] [ranger](https://github.com/ranger/ranger)-like thumbnail preview
   - [ ] needs testing

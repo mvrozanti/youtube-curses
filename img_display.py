@@ -27,6 +27,7 @@ W3MIMGDISPLAY_PATHS = [
 ]
 
 log = logging.getLogger()
+log.propagate = False
 
 class ImageDisplayError(Exception):
     pass
@@ -189,7 +190,9 @@ class W3MImageDisplayer(ImageDisplayer, threading.Thread):
         self.process.stdin.flush()
         output = self.process.stdout.readline().split()
 
-        if len(output) != 2: raise ImageDisplayError('Failed to execute w3mimgdisplay', output, 'for', path, cmd)
+        if len(output) != 2:
+            log.error(ImageDisplayError('Failed to execute w3mimgdisplay', output, 'for', path, cmd))
+            return ""
 
         width = int(output[0])
         height = int(output[1])
