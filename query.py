@@ -99,7 +99,9 @@ def get_front_page(ccount, vcount):
                     vid_snippet = cv['snippet']
                     img_url = vid_snippet['thumbnails']['high']['url']
                     vid_title = vid_snippet['title']
-                    channel_vids.append({'lnk': vid_link, 'ttl': vid_title, 'tf': tf.name})
+                    vid_desc = vid_snippet['description']
+                    vid_dat = vid_snippet['publishedAt'] # parse?
+                    channel_vids.append({'dat': vid_dat, 'dsc': vid_desc, 'lnk': vid_link, 'ttl': vid_title, 'tf': tf.name})
                     img_download_threads.append(threading.Thread(target=download_image, args=[tf,img_url]))
 #             except: pass
             except: raise
@@ -118,5 +120,6 @@ def get_home_page():
     return subs_dict
 
 if __name__ == '__main__':
-    results = search('kek', part='snippet')
-    code.interact(local=locals())
+    get_front_page(1,1)
+#     results = search('kek', part='snippet')
+#     code.interact(local=locals())

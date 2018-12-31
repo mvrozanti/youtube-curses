@@ -1,15 +1,16 @@
 #!/usr/bin/env python3.6
-import curses, json, pycurl, subprocess, textwrap, urllib.parse
 import os
-from io import BytesIO
+import sys
+import code
+from math import ceil
+import logging
+import argparse
 from query import *
 import itertools
 import threading
-import code
-import argparse
-import sys
-import logging
+from io import BytesIO
 from img_display import W3MImageDisplayer
+import curses, json, pycurl, subprocess, textwrap, urllib.parse
 
 log = logging.getLogger()
 log.propagate = False
@@ -90,10 +91,10 @@ def main(args):
                 win_r.addstr(windowsize[0]-3, windowsize[1]//2-11, "refresh: r")
                 win_r.addstr(windowsize[0]-1, windowsize[1]//2-9,  "quit: q")
                 win_l.addstr(windowsize[0]-1, windowsize[1]//2-9,  "page: "+str(page+1))
-                win_l.addstr(windowsize[0]-1, windowsize[1]//2-23, "highlight "+str(highlight))
-                win_l.addstr(windowsize[0]-1, windowsize[1]//2-38, "w_item_count "+str(w_item_count))
-                try: win_l.addstr(windowsize[0]-1, windowsize[1]//2-46, "itemcount "+str(itemcount))
-                except: pass
+#                 win_l.addstr(windowsize[0]-1, windowsize[1]//2-23, "highlight "+str(highlight))
+#                 win_l.addstr(windowsize[0]-1, windowsize[1]//2-38, "w_item_count "+str(w_item_count))
+#                 try: win_l.addstr(windowsize[0]-1, windowsize[1]//2-46, "itemcount "+str(itemcount))
+#                 except: pass
 #                 win_l.addstr(windowsize[0]-1, windowsize[1]//2-37, "itemcount "+str(itemcount))
                 index = 0
                 if state == "top":
@@ -118,15 +119,20 @@ def main(args):
                     for v_ix,vid in enumerate(currentpage_vids[w_item_count*page:w_item_count*(page+1)]):
                         vid_title = vid['ttl']
                         vid_link = vid['lnk']
+                        vid_desc = vid['dsc']
+                        vid_dat = vid['dat']
                         tf = vid['tf']
                         if index < w_item_count:
                             if index == highlight:
                                 w3mid.quit()
-                                w3mid = W3MImageDisplayer()
+                               w3mid = W3MImageDisplayer()
                                 w3mid.set_params(tf, windowsize[1] - windowsize[1]/3, 1, windowsize[1], windowsize[0])
                                 w3mid.start()
+                                dsc_rows = int(ceil(len(vid_desc)/maxlen))
+                                for i in range(1, dsc_rows+1):
+                                    win_r.addnstr(20+i, 2, vid['dsc'][(i*maxlen)-maxlen:i*maxlen], maxlen)
                                 win_l.addnstr(index*2+2, 2, vid_title, maxlen, curses.A_REVERSE)
-                                win_r.addnstr(20, 2, 'something will appear here!', maxlen)
+                                win_r.addnstr(18, 2, vid_dat, maxlen, curses.A_REVERSE)
                             else: win_l.addnstr(index*2+2, 2, vid_title, maxlen)
                         index += 1
                 win_l.refresh()
