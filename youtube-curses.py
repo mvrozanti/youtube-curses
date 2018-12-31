@@ -21,14 +21,14 @@ def init_display(stdscr):
     global maxlen
     global win_l
     global win_r
-    global maxitems
+    global w_item_count
     stdscr.clear()
     size = stdscr.getmaxyx()
     stdscr.addstr(size[0]//2-1, size[1]//2-5, "Loading...")
     stdscr.move(0,0)
     stdscr.refresh()
     maxlen = size[1] // 2 - 4
-    maxitems = size[0] // 2 - 3
+    w_item_count = size[0] // 2 - 3
     win_l = curses.newwin(size[0], size[1] // 2, 0, 0)
     win_r = curses.newwin(size[0], size[1] // 2, 0, size[1] // 2)
     return size
@@ -91,17 +91,17 @@ def main(args):
                 win_r.addstr(windowsize[0]-1, windowsize[1]//2-9,  "quit: q")
                 win_l.addstr(windowsize[0]-1, windowsize[1]//2-9,  "page: "+str(page+1))
                 win_l.addstr(windowsize[0]-1, windowsize[1]//2-23, "highlight "+str(highlight))
-                win_l.addstr(windowsize[0]-1, windowsize[1]//2-38, "maxitems "+str(maxitems))
-                try: win_l.addstr(windowsize[0]-1, windowsize[1]//2-46, "totalitems "+str(totalitems))
+                win_l.addstr(windowsize[0]-1, windowsize[1]//2-38, "w_item_count "+str(w_item_count))
+                try: win_l.addstr(windowsize[0]-1, windowsize[1]//2-46, "itemcount "+str(itemcount))
                 except: pass
-#                 win_l.addstr(windowsize[0]-1, windowsize[1]//2-37, "totalitems "+str(totalitems))
+#                 win_l.addstr(windowsize[0]-1, windowsize[1]//2-37, "itemcount "+str(itemcount))
                 index = 0
                 if state == "top":
-                    totalitems = len(data)
-                    currentpage = list(data.keys())[maxitems*page:maxitems*(page+1)]
+                    itemcount = len(data)
+                    currentpage = list(data.keys())[w_item_count*page:w_item_count*(page+1)]
                     try:
                         for channel_title in currentpage:
-                            if index < maxitems:
+                            if index < w_item_count:
                                 if index == highlight:
                                     win_l.addnstr(index*2+2, 2, channel_title, maxlen, curses.A_REVERSE)
                                     vids = data[channel_title]
@@ -114,12 +114,12 @@ def main(args):
                     except Exception as e: log.exception(e)
                 if state == "search":
                     currentpage_vids = data[list(data)[hl_cache]]
-                    totalitems = len(currentpage_vids)
-                    for v_ix,vid in enumerate(currentpage_vids[maxitems*page:maxitems*(page+1)]):
+                    itemcount = len(currentpage_vids)
+                    for v_ix,vid in enumerate(currentpage_vids[w_item_count*page:w_item_count*(page+1)]):
                         vid_title = vid['ttl']
                         vid_link = vid['lnk']
                         tf = vid['tf']
-                        if index < maxitems:
+                        if index < w_item_count:
                             if index == highlight:
                                 w3mid.quit()
                                 w3mid = W3MImageDisplayer()
@@ -134,8 +134,8 @@ def main(args):
             key = stdscr.getch()
 
             if key == curses.KEY_DOWN or key == ord('j'):
-                if highlight + page * maxitems + 1 < totalitems:
-                    if highlight + 1 == maxitems:
+                if highlight + page * w_item_count + 1 < itemcount:
+                    if highlight + 1 == w_item_count:
                         page += 1
                         highlight = 0
                     else: highlight += 1
@@ -143,10 +143,10 @@ def main(args):
             elif key == curses.KEY_UP or key == ord('k'):
                 if highlight == 0 and page > 0:
                     page -= 1
-                    highlight = maxitems - 1
+                    highlight = w_item_count - 1
                 elif highlight > 0: highlight -= 1
 
-            elif key == curses.KEY_NPAGE and totalitems > (page+1) * maxitems: page += 1
+            elif key == curses.KEY_NPAGE and itemcount > (page+1) * w_item_count: page += 1
 
             elif key == curses.KEY_PPAGE and page > 0: page -= 1
 
@@ -162,9 +162,13 @@ def main(args):
                     highlight = 0
                     page = 0
 
+            elif key == curses.KEY_LEFT or key == ord('g'):
+                page = 0
+                highlight = 0
+
             elif key == curses.KEY_LEFT or key == ord('G'):
-                page = maxitems % totalitems
-                highlight = maxitems
+                page = itemcount // w_item_count
+                highlight = itemcount % w_item_count - 1
 
             elif key == curses.KEY_LEFT or key == ord('b') or key == ord('B') or key == ord('h'):
                 if state != "top":

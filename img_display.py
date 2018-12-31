@@ -111,9 +111,9 @@ class W3MImageDisplayer(ImageDisplayer, threading.Thread):
         for path in paths:
             if path is not None and os.path.exists(path):
                 return path
-        raise ImageDisplayError("No w3mimgdisplay executable found.  Please set "
+        log.error(ImageDisplayError("No w3mimgdisplay executable found.  Please set "
                                 "the path manually by setting the %s environment variable.  (see "
-                                "man page)" % W3MIMGDISPLAY_ENV)
+                                "man page)" % W3MIMGDISPLAY_ENV))
 
     def _get_font_dimensions(self):
         # Get the height and width of a character displayed in the terminal in
