@@ -25,6 +25,7 @@ This is a simple youtube browser / streamlink frontend made with python and ncur
 - [X] Logfile argument
 - [X] [ranger](https://github.com/ranger/ranger)-like thumbnail preview
   - [ ] needs testing
+- [ ] Animated loading symbols
 - [ ] Make `streamlink` call outside main thread (user will be able to browse while watching a video)
 - [ ] Comment section abilities
   - [ ] Show comment section
