@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 import os
-import sys
 import code
 from math import ceil
 import logging
+from query import get_front_page, search
 import argparse
-from query import *
-import itertools
 import threading
-from io import BytesIO
 from img_display import W3MImageDisplayer
-import curses, json, pycurl, subprocess, textwrap, urllib.parse
+import curses, subprocess
 
 log = logging.getLogger()
 log.propagate = False
@@ -48,11 +45,15 @@ def prompt(msg):
 
 def streamlink(url):
     url += '?disable_polymer=1'
-    ls_exit_code = 1
-    while ls_exit_code != 0: ls_exit_code = subprocess.call(["streamlink", url, q[quality]], stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
+    try:
+        subprocess.call(["streamlink", url, q[quality]], stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
+    except OSError as e: 
+        if e.errno == os.errno.ENOENT:
+            print('streamlink utility is missing. See README.md requirements section')
 
 def main(args):
     global windowsize
+    global quality
     # todo: parse args
     w3mid = W3MImageDisplayer()
     highlight = 0
@@ -64,6 +65,7 @@ def main(args):
     donothing = False
 
     # init curses stuff
+    data = get_front_page(args.channel_count, args.video_count)
     stdscr = curses.initscr()
     curses.noecho()
     curses.cbreak()
@@ -72,7 +74,6 @@ def main(args):
 
     try:
         windowsize = init_display(stdscr)
-        data = get_front_page(args.channel_count, args.video_count)
         cache = data
         while key != ord('q') and key != ord('Q'):
             if windowsize[0] < 10 or windowsize[1] < 32:
@@ -106,10 +107,12 @@ def main(args):
                                     win_l.addnstr(index*2+2, 2, channel_title, maxlen, curses.A_REVERSE)
                                     vids = data[channel_title]
                                     for v_ix,v in enumerate(vids):
-                                        vid_link = v['lnk']
+                                        # vid_link = v['lnk']
                                         vid_title = v['ttl']
                                         win_r.addnstr(v_ix*2+4, 2, vid_title, maxlen)
                                 else: win_l.addnstr(index*2+2, 2, channel_title, maxlen)
+                                win_l.refresh()
+                                win_r.refresh()
                             index += 1
                     except Exception as e: log.exception(e)
                 if state == "search":
@@ -117,25 +120,26 @@ def main(args):
                     itemcount = len(currentpage_vids)
                     for v_ix,vid in enumerate(currentpage_vids[w_item_count*page:w_item_count*(page+1)]):
                         vid_title = vid['ttl']
-                        vid_link = vid['lnk']
+                        # vid_link = vid['lnk']
                         vid_desc = vid['dsc']
                         vid_dat = vid['dat']
                         tf = vid['tf']
                         if index < w_item_count:
                             if index == highlight:
-                                w3mid.quit()
-                                w3mid = W3MImageDisplayer()
-                                w3mid.set_params(tf, windowsize[1] - windowsize[1]/3, 1, windowsize[1], windowsize[0])
-                                w3mid.start()
                                 dsc_rows = int(ceil(len(vid_desc)/maxlen))
                                 for i in range(1, dsc_rows+1):
                                     win_r.addnstr(20+i, 2, vid['dsc'][(i*maxlen)-maxlen:i*maxlen], maxlen)
                                 win_l.addnstr(index*2+2, 2, vid_title, maxlen, curses.A_REVERSE)
                                 win_r.addnstr(18, 2, vid_dat, maxlen, curses.A_REVERSE)
-                            else: win_l.addnstr(index*2+2, 2, vid_title, maxlen)
+                                win_l.refresh()
+                                win_r.refresh()
+                                w3mid.quit()
+                                w3mid = W3MImageDisplayer()
+                                w3mid.set_params(tf, windowsize[1] - windowsize[1]/3, 1, windowsize[1], windowsize[0])
+                                w3mid.start()
+                            else: 
+                                win_l.addnstr(index*2+2, 2, vid_title, maxlen)
                         index += 1
-                win_l.refresh()
-                win_r.refresh()
             key = stdscr.getch()
 
             if key == curses.KEY_DOWN or key == ord('j'):

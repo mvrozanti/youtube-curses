@@ -50,7 +50,7 @@ This is a simple youtube browser / streamlink frontend made with python and ncur
   - [ ] Share link (at current time or not)
 - [ ] Cached elements / internal database (?) for faster bootup
   - [ ] Video information such as thumbnails, channel, link and title
-- [ ] Published on PyPi
+- [x] Published on PyPi
 
 # Requirements
 
