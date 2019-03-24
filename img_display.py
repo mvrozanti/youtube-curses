@@ -98,17 +98,6 @@ class W3MImageDisplayer(ImageDisplayer, threading.Thread):
         if self.path_queue.qsize() == 2: self.path_queue.get()
         path = self.path_queue.get()
         self.draw(path, self.x, self.y, self.w, self.h)
-        # while not self.stop_event.is_set():
-        #     if self.path_queue.qsize() == 2: self.path_queue.get()
-        #     path = self.path_queue.get()
-        #     try:
-        #         input_gen = self._generate_w3m_input(path, self.x, self.y, self.w, self.h)
-        #         if input_gen is not None:
-        #             self.process.stdin.write(input_gen)
-        #             self.process.stdin.flush()
-        #             break;
-        #     except Exception as e: log.exception(e)
-# #             finally: self.path_queue.put(path)
 
 
     @staticmethod
