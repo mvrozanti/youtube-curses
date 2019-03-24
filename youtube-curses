@@ -111,8 +111,6 @@ def main(args):
                                         vid_title = v['ttl']
                                         win_r.addnstr(v_ix*2+4, 2, vid_title, maxlen)
                                 else: win_l.addnstr(index*2+2, 2, channel_title, maxlen)
-                                win_l.refresh()
-                                win_r.refresh()
                             index += 1
                     except Exception as e: log.exception(e)
                 if state == "search":
@@ -131,8 +129,6 @@ def main(args):
                                     win_r.addnstr(20+i, 2, vid['dsc'][(i*maxlen)-maxlen:i*maxlen], maxlen)
                                 win_l.addnstr(index*2+2, 2, vid_title, maxlen, curses.A_REVERSE)
                                 win_r.addnstr(18, 2, vid_dat, maxlen, curses.A_REVERSE)
-                                win_l.refresh()
-                                win_r.refresh()
                                 w3mid.quit()
                                 w3mid = W3MImageDisplayer()
                                 w3mid.set_params(tf, windowsize[1] - windowsize[1]/3, 1, windowsize[1], windowsize[0])
@@ -140,6 +136,8 @@ def main(args):
                             else: 
                                 win_l.addnstr(index*2+2, 2, vid_title, maxlen)
                         index += 1
+            win_l.refresh()
+            win_r.refresh()
             key = stdscr.getch()
 
             if key == curses.KEY_DOWN or key == ord('j'):

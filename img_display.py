@@ -27,7 +27,7 @@ W3MIMGDISPLAY_PATHS = [
 ]
 
 log = logging.getLogger()
-log.propagate = False
+log.setLevel(logging.FATAL)
 
 class ImageDisplayError(Exception):
     pass
@@ -92,17 +92,23 @@ class W3MImageDisplayer(ImageDisplayer, threading.Thread):
         self.stop_event.set()
 
     def run(self):
+        from time import sleep
+        sleep(0.04)
         if not self.is_initialized or self.process.poll() is not None: self.initialize()
-        while not self.stop_event.is_set():
-            if self.path_queue.qsize() == 2: self.path_queue.get()
-            path = self.path_queue.get()
-            try:
-                input_gen = self._generate_w3m_input(path, self.x, self.y, self.w, self.h)
-                if input_gen is not None:
-                    self.process.stdin.write(input_gen)
-                    self.process.stdin.flush()
-            except Exception as e: log.exception(e)
-#             finally: self.path_queue.put(path)
+        if self.path_queue.qsize() == 2: self.path_queue.get()
+        path = self.path_queue.get()
+        self.draw(path, self.x, self.y, self.w, self.h)
+        # while not self.stop_event.is_set():
+        #     if self.path_queue.qsize() == 2: self.path_queue.get()
+        #     path = self.path_queue.get()
+        #     try:
+        #         input_gen = self._generate_w3m_input(path, self.x, self.y, self.w, self.h)
+        #         if input_gen is not None:
+        #             self.process.stdin.write(input_gen)
+        #             self.process.stdin.flush()
+        #             break;
+        #     except Exception as e: log.exception(e)
+# #             finally: self.path_queue.put(path)
 
 
     @staticmethod
@@ -140,6 +146,7 @@ class W3MImageDisplayer(ImageDisplayer, threading.Thread):
             input_gen = self._generate_w3m_input(path, start_x, start_y, width, height)
             self.process.stdin.write(input_gen)
             self.process.stdin.flush()
+            self.process.stdout.readline()
         except ImageDisplayError as e: log.exception(e)
         finally:
             self.quit()
@@ -186,8 +193,12 @@ class W3MImageDisplayer(ImageDisplayer, threading.Thread):
         # get image size
         cmd = "5;{}\n".format(path)
 
-        self.process.stdin.write(cmd)
-        self.process.stdin.flush()
+        try:
+            self.process.stdin.write(cmd)
+            self.process.stdin.flush()
+        except Exception:
+            log.error(ImageDisplayError('Failed to execute w3mimgdisplay on', cmd))
+            return 
         output = self.process.stdout.readline().split()
 
         if len(output) != 2:
@@ -217,8 +228,3 @@ class W3MImageDisplayer(ImageDisplayer, threading.Thread):
     def quit(self):
         if self.is_initialized and self.process and self.process.poll() is None:
             self.process.kill()
-
-if __name__ == '__main__':
-    w3mid = W3MImageDisplayer()
-    w3mid.set_params(sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]))
-    w3mid.start()
