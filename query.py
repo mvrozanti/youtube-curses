@@ -3,18 +3,16 @@
 import os
 import sys
 import code
-import json
 import random
 import pickle
 import urllib3
 import logging
+import datetime
 import tempfile
 import threading
 import os.path as op
 from collections import OrderedDict
-import google.oauth2.credentials
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 
@@ -77,6 +75,22 @@ def download_image(tf, url):
     tf.write(pool_manager.request('GET', url, preload_content=False).read())
     tf.close()
 
+def html_decode(s):
+    """
+    Returns the ASCII decoded version of the given HTML string. This does
+    NOT remove normal HTML tags like <p>.
+    """
+    html_codes = (
+            ("'", '&#39;'),
+            ('"', '&quot;'),
+            ('>', '&gt;'),
+            ('<', '&lt;'),
+            ('&', '&amp;')
+        )
+    for html_code in html_codes:
+        s = s.replace(html_code[1], html_code[0])
+    return s
+
 def get_front_page(ccount, vcount):
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     service = get_authenticated_service()
@@ -98,9 +112,9 @@ def get_front_page(ccount, vcount):
                     tf = tempfile.NamedTemporaryFile(delete=False)
                     vid_snippet = cv['snippet']
                     img_url = vid_snippet['thumbnails']['high']['url']
-                    vid_title = vid_snippet['title']
-                    vid_desc = vid_snippet['description']
-                    vid_dat = vid_snippet['publishedAt'] # parse?
+                    vid_title = html_decode(vid_snippet['title'])
+                    vid_desc = html_decode(vid_snippet['description'])
+                    vid_dat = datetime.datetime.strptime(vid_snippet['publishedAt'].replace('.000Z', ''), '%Y-%m-%dT%H:%M:%S')
                     channel_vids.append({'dat': vid_dat, 'dsc': vid_desc, 'lnk': vid_link, 'ttl': vid_title, 'tf': tf.name})
                     img_download_threads.append(threading.Thread(target=download_image, args=[tf,img_url]))
 #             except: pass
