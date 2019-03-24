@@ -1,4 +1,7 @@
-__pycache__/*
+__pycache__/
+build/
+youtube_curses.egg-info/
+dist/
 *.pyc
 *.json
 *.dat
