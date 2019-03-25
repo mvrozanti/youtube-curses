@@ -58,12 +58,8 @@ def main(args):
     global quality
     # todo: parse args
     w3mid = W3MImageDisplayer()
-    highlight = 0
-    page = 0
-    hl_cache = 0
-    p_cache = 0
+    highlight = page = hl_cache = p_cache = key = 0
     state = "top"
-    key = 0
     donothing = False
 
     # init curses stuff
