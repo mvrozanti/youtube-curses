@@ -2,7 +2,7 @@
 
 # Usage
 
-![Usage](https://i.giphy.com/media/AEs9nDZvJqqWEheI1G/source.gif)
+![Usage](https://i.giphy.com/media/2dq12HoXes5LGVC1da/source.gif)
 This is a simple youtube browser / streamlink frontend made with python and ncurses inspired by [twitch-curses](https://github.com/mvrozanti/twitch-curses).
 
 ## Install
