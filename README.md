@@ -29,7 +29,6 @@ This is a simple youtube browser / streamlink frontend made with python and ncur
 - [X] [ranger](https://github.com/ranger/ranger)-like thumbnail preview
   - [ ] needs testing
 - [ ] Animated loading symbols
-- [ ] Make `streamlink` call outside main thread (user will be able to browse while watching a video)
 - [ ] Comment section abilities
   - [ ] Show comment section
   - [ ] Show comment count
@@ -48,9 +47,9 @@ This is a simple youtube browser / streamlink frontend made with python and ncur
 - [ ] Interact with video
   - [ ] Turn notifications on or off
   - [ ] Like/Dislike
-  - [ ] Report
   - [ ] Save as (watch later/favorites/existing playlist/new playlist)
   - [ ] Share link (at current time or not)
+  - [ ] Report
 - [ ] Cached elements / internal database (?) for faster bootup
   - [ ] Video information such as thumbnails, channel, link and title
 

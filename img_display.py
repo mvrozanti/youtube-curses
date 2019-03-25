@@ -6,12 +6,9 @@ from queue import Queue
 import threading
 import logging
 import termios
-import base64
 import struct
-import imghdr
 import errno
 import fcntl
-import time
 import code
 import sys
 import os
@@ -28,6 +25,7 @@ W3MIMGDISPLAY_PATHS = [
 
 log = logging.getLogger()
 log.setLevel(logging.FATAL)
+log.propagate = True
 
 class ImageDisplayError(Exception):
     pass
@@ -79,7 +77,7 @@ class W3MImageDisplayer(ImageDisplayer, threading.Thread):
         self.binary_path = None
         self.binary_path = self._find_w3mimgdisplay_executable()  # may crash
         self.process = Popen([self.binary_path] + W3MIMGDISPLAY_OPTIONS, stdin=PIPE, stdout=PIPE, universal_newlines=True)
-        self.is_initialized = True
+        self.is_initialized = False
 
     def set_params(self,path,x,y,w,h):
         self.path_queue.put(path)
@@ -130,12 +128,15 @@ class W3MImageDisplayer(ImageDisplayer, threading.Thread):
         return (xpixels // cols), (ypixels // rows)
 
     def draw(self, path, start_x, start_y, width, height):
-        if not self.is_initialized or self.process.poll() is not None: self.initialize()
+        if self.is_initialized: return 
+        self.is_initialized = True
+        if self.process.poll() is not None: self.initialize()
         try:
             input_gen = self._generate_w3m_input(path, start_x, start_y, width, height)
-            self.process.stdin.write(input_gen)
-            self.process.stdin.flush()
-            self.process.stdout.readline()
+            if input_gen:
+                self.process.stdin.write(input_gen)
+                self.process.stdin.flush()
+                self.process.stdout.readline()
         except ImageDisplayError as e: log.exception(e)
         finally:
             self.quit()

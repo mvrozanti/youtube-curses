@@ -54,22 +54,31 @@ def channels_list_by_username(service, **kwargs):
                 results['items'][0]['snippet']['title'],
                 results['items'][0]['statistics']['viewCount']))
 
-def search(keyword, **kwargs):
+def search(keyword, vcount, **kwargs):
     service = get_authenticated_service()
-    vids_dict = service.search().list(q=keyword,**kwargs).execute()
-    search_results = []
-    for v_ix,i in enumerate(vids_dict['items']):
+    subs_dict = service.search().list(part='id,snippet', q=keyword, maxResults=ccount, mine=True).execute()
+    subs = subs_dict['items']
+    results = OrderedDict()
+    for sub_ix,i in enumerate(subs):
+        vid_snippet = i['snippet']
+        vid_title = vid_snippet['title']
+        img_download_threads = []
         try:
-            if 'videoId' in i['id']:
-                vid_link = 'https://youtube.com/watch?v=' + i['id']['videoId']
-                tf = tempfile.NamedTemporaryFile(delete=False)
-                vid_snippet = i['snippet']
-                img_url = vid_snippet['thumbnails']['high']['url']
-                vid_title = vid_snippet['title']
-                search_results.append({'lnk': vid_link, 'ttl': vid_title, 'tf': tf.name})
-                img_download_threads.append(threading.Thread(target=download_image, args=[tf,img_url]))
-        except Exception as e: log.debug(e)
-    return search_results
+            vid_link = 'https://youtube.com/watch?v=' + cv['id']['videoId']
+            tf = tempfile.NamedTemporaryFile(delete=False)
+            img_url = vid_snippet['thumbnails']['high']['url']
+            vid_title = html_decode(vid_snippet['title'])
+            vid_desc = html_decode(vid_snippet['description'])
+            vid_dat = datetime.datetime.strptime(vid_snippet['publishedAt'].replace('.000Z', ''), '%Y-%m-%dT%H:%M:%S')
+            results.append({'dat': vid_dat, 'dsc': vid_desc, 'lnk': vid_link, 'ttl': vid_title, 'tf': tf.name})
+            img_download_threads.append(threading.Thread(target=download_image, args=[tf,img_url]))
+        except: raise
+        for t in img_download_threads: t.start()
+        results[channel_title] = channel_vids
+    keys = list(results)
+    random.shuffle(keys)
+    for key in keys: results.move_to_end(key)
+    return results
 
 def download_image(tf, url):
     tf.write(pool_manager.request('GET', url, preload_content=False).read())
@@ -92,15 +101,13 @@ def html_decode(s):
     return s
 
 def get_front_page(ccount, vcount):
-    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     service = get_authenticated_service()
-    log.debug('Authenticated')
     subs_dict = service.subscriptions().list(part='id,snippet', maxResults=ccount, mine=True).execute()
     subs = subs_dict['items']
     front_page = OrderedDict()
     for sub_ix,i in enumerate(subs):
         channel_snippet = i['snippet']
-        channel_id = channel_snippet['resourceId']['channelId']
+        channel_id = channel_snippet['resourceId']['channelId'] 
         channel_title = channel_snippet['title']
         response = service.search().list(part='snippet', maxResults=vcount, channelId=channel_id, order='date', type='').execute()
         channel_vids = []
@@ -117,7 +124,6 @@ def get_front_page(ccount, vcount):
                     vid_dat = datetime.datetime.strptime(vid_snippet['publishedAt'].replace('.000Z', ''), '%Y-%m-%dT%H:%M:%S')
                     channel_vids.append({'dat': vid_dat, 'dsc': vid_desc, 'lnk': vid_link, 'ttl': vid_title, 'tf': tf.name})
                     img_download_threads.append(threading.Thread(target=download_image, args=[tf,img_url]))
-#             except: pass
             except: raise
         for t in img_download_threads: t.start()
         front_page[channel_title] = channel_vids
@@ -127,13 +133,13 @@ def get_front_page(ccount, vcount):
     return front_page
 
 def get_home_page():
-    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     service = get_authenticated_service()
     log.debug('Authenticated')
     subs_dict = service.activities().list(part='snippet', maxResults=25, home=True,).execute()
     return subs_dict
 
 if __name__ == '__main__':
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     get_front_page(1,1)
 #     results = search('kek', part='snippet')
 #     code.interact(local=locals())
