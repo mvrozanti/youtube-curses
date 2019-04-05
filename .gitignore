@@ -2,6 +2,7 @@ __pycache__/
 build/
 youtube_curses.egg-info/
 dist/
+up-pypi.sh
 *.pyc
 *.json
 *.dat

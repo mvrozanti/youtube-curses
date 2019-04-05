@@ -61,7 +61,7 @@ def search(keyword, vcount, **kwargs):
             vid = {}
             vid['id'] = i['id']['videoId']
             vid['lnk'] = 'https://youtube.com/watch?v=' + vid['id']  
-            vid['stats'] = get_authenticated_service().videos().list(part='statistics', id=vid['id']).execute()
+            vid['stats'] = get_authenticated_service().videos().list(part='statistics', id=vid['id'])
             vid['ttl'] = html_decode(vid_snippet['title'])
             vid['dsc']  = html_decode(vid_snippet['description'])
             vid['dat']   = datetime.datetime.strptime(vid_snippet['publishedAt'].replace('.000Z', ''), '%Y-%m-%dT%H:%M:%S')
