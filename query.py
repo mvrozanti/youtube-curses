@@ -47,33 +47,29 @@ def get_authenticated_service():
         with open(credentials_path, 'wb') as credentials_dat: pickle.dump(credentials, credentials_dat)
     return build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
-def channels_list_by_username(service, **kwargs):
-    results = service.channels().list(**kwargs).execute()
-    log.debug('This channel\'s ID is %s. Its title is %s, and it has %s views.' %
-             (results['items'][0]['id'],
-                results['items'][0]['snippet']['title'],
-                results['items'][0]['statistics']['viewCount']))
-
 def search(keyword, vcount, **kwargs):
     service = get_authenticated_service()
-    subs_dict = service.search().list(part='id,snippet', q=keyword, maxResults=vcount).execute()
+    subs_dict = service.search().list(part='id, snippet', q=keyword, maxResults=vcount).execute()
     subs = subs_dict['items']
     results = OrderedDict()
     for sub_ix,i in enumerate(subs):
         vid_snippet = i['snippet']
-        vid_title = vid_snippet['title']
         channel_title = i['snippet']['channelTitle']
         img_download_threads = []
         channel_vids = []
         try:
-            vid_link = 'https://youtube.com/watch?v=' + i['id']['videoId']
+            vid = {}
+            vid['id'] = i['id']['videoId']
+            vid['lnk'] = 'https://youtube.com/watch?v=' + vid['id']  
+            vid['stats'] = get_authenticated_service().videos().list(part='statistics', id=vid['id']).execute()
+            vid['ttl'] = html_decode(vid_snippet['title'])
+            vid['dsc']  = html_decode(vid_snippet['description'])
+            vid['dat']   = datetime.datetime.strptime(vid_snippet['publishedAt'].replace('.000Z', ''), '%Y-%m-%dT%H:%M:%S')
             tf = tempfile.NamedTemporaryFile(delete=False)
+            vid['tf'] = tf.name
             img_url = vid_snippet['thumbnails']['high']['url']
-            vid_title = html_decode(vid_snippet['title'])
-            vid_desc = html_decode(vid_snippet['description'])
-            vid_dat = datetime.datetime.strptime(vid_snippet['publishedAt'].replace('.000Z', ''), '%Y-%m-%dT%H:%M:%S')
-            channel_vids.append({'dat': vid_dat, 'dsc': vid_desc, 'lnk': vid_link, 'ttl': vid_title, 'tf': tf.name})
             img_download_threads.append(threading.Thread(target=download_image, args=[tf,img_url]))
+            channel_vids.append(vid)
         except: raise
         for t in img_download_threads: t.start()
         results[channel_title] = channel_vids
@@ -117,14 +113,18 @@ def get_front_page(ccount, vcount):
         for vid_ix,cv in enumerate(response['items']):
             try:
                 if 'videoId' in cv['id']:
-                    vid_link = 'https://youtube.com/watch?v=' + cv['id']['videoId']
-                    tf = tempfile.NamedTemporaryFile(delete=False)
                     vid_snippet = cv['snippet']
+                    vid = {}
+                    vid['id'] = cv['id']['videoId']
+                    vid['lnk'] = 'https://youtube.com/watch?v=' + vid['id']
+                    vid['ttl'] = html_decode(vid_snippet['title'])
+                    vid['dsc'] = html_decode(vid_snippet['description'])
+                    vid['dat'] = datetime.datetime.strptime(vid_snippet['publishedAt'].replace('.000Z', ''), '%Y-%m-%dT%H:%M:%S')
+                    vid['stats'] = get_authenticated_service().videos().list(part='statistics', id=vid['id']) #.execute()['items'][0]['statistics']
+                    tf = tempfile.NamedTemporaryFile(delete=False)
+                    vid['tf'] = tf.name
+                    channel_vids.append(vid)
                     img_url = vid_snippet['thumbnails']['high']['url']
-                    vid_title = html_decode(vid_snippet['title'])
-                    vid_desc = html_decode(vid_snippet['description'])
-                    vid_dat = datetime.datetime.strptime(vid_snippet['publishedAt'].replace('.000Z', ''), '%Y-%m-%dT%H:%M:%S')
-                    channel_vids.append({'dat': vid_dat, 'dsc': vid_desc, 'lnk': vid_link, 'ttl': vid_title, 'tf': tf.name})
                     img_download_threads.append(threading.Thread(target=download_image, args=[tf,img_url]))
             except: raise
         for t in img_download_threads: t.start()
@@ -142,6 +142,6 @@ def get_home_page():
 
 if __name__ == '__main__':
     # os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-    # get_front_page(1,1)
-    results = search('kek', 10, part='snippet')
-    code.interact(local=locals())
+    results = get_front_page(1,1)
+    # results = search('kek', 10, part='snippet')
+    code.interact(local=globals().update(locals()) or globals())

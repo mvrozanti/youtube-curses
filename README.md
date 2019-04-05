@@ -15,7 +15,7 @@ This is a simple youtube browser / streamlink frontend made with python and ncur
 - [X] Search for content (prompt user)
 - [ ] Get "recommended videos" (how tho?)
 - [ ] Change sorting order
-- [ ] Like/Dislike bar
+- [X] Like/Dislike bar
 - [ ] Show video length
 - [ ] Show upload date
 - [ ] Show channel's subscriber count

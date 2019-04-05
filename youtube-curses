@@ -127,6 +127,19 @@ def main(args):
                                     win_r.addnstr(20+i, 2, vid['dsc'][(i*maxlen)-maxlen:i*maxlen], maxlen)
                                 win_l.addnstr(index*2+2, 2, vid_title, maxlen, curses.A_REVERSE)
                                 win_r.addnstr(18, 2, vid_dat.strftime("%A, %d. %B %Y %I:%M%p"), maxlen)
+                                # view_count = vid['stats']['viewCount']
+
+                                like_bar_len = 40
+                                if type(vid['stats']) is not dict:
+                                    vid['stats'] = vid['stats'].execute()['items'][0]['statistics']
+                                like_count = int(vid['stats']['likeCount'])
+                                dislike_count = int(vid['stats']['dislikeCount'])
+                                react_count = like_count + dislike_count
+                                like_amount = int(like_count * like_bar_len / react_count)
+                                dislike_amount = int(dislike_count * like_bar_len / react_count)
+                                like_bar = like_amount*'━' + dislike_amount*'─'
+                                win_r.addnstr(18, maxlen-like_bar_len, like_bar, maxlen)
+
                                 w3mid.quit()
                                 w3mid = W3MImageDisplayer()
                                 w3mid.set_params(tf, windowsize[1] - windowsize[1]/3, 1, windowsize[1], windowsize[0])
@@ -197,7 +210,8 @@ def main(args):
                 windowsize = init_display(stdscr)
                 keyword = prompt('Search for videos')
                 data = search(keyword, 10, part='snippet')
-                state = 'search'
+                # state = 'search'
+                state = 'top'
                 highlight = 0
                 page = 0
 
