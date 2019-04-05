@@ -56,21 +56,23 @@ def channels_list_by_username(service, **kwargs):
 
 def search(keyword, vcount, **kwargs):
     service = get_authenticated_service()
-    subs_dict = service.search().list(part='id,snippet', q=keyword, maxResults=ccount, mine=True).execute()
+    subs_dict = service.search().list(part='id,snippet', q=keyword, maxResults=vcount).execute()
     subs = subs_dict['items']
     results = OrderedDict()
     for sub_ix,i in enumerate(subs):
         vid_snippet = i['snippet']
         vid_title = vid_snippet['title']
+        channel_title = i['snippet']['channelTitle']
         img_download_threads = []
+        channel_vids = []
         try:
-            vid_link = 'https://youtube.com/watch?v=' + cv['id']['videoId']
+            vid_link = 'https://youtube.com/watch?v=' + i['id']['videoId']
             tf = tempfile.NamedTemporaryFile(delete=False)
             img_url = vid_snippet['thumbnails']['high']['url']
             vid_title = html_decode(vid_snippet['title'])
             vid_desc = html_decode(vid_snippet['description'])
             vid_dat = datetime.datetime.strptime(vid_snippet['publishedAt'].replace('.000Z', ''), '%Y-%m-%dT%H:%M:%S')
-            results.append({'dat': vid_dat, 'dsc': vid_desc, 'lnk': vid_link, 'ttl': vid_title, 'tf': tf.name})
+            channel_vids.append({'dat': vid_dat, 'dsc': vid_desc, 'lnk': vid_link, 'ttl': vid_title, 'tf': tf.name})
             img_download_threads.append(threading.Thread(target=download_image, args=[tf,img_url]))
         except: raise
         for t in img_download_threads: t.start()
@@ -108,7 +110,7 @@ def get_front_page(ccount, vcount):
     for sub_ix,i in enumerate(subs):
         channel_snippet = i['snippet']
         channel_id = channel_snippet['resourceId']['channelId'] 
-        channel_title = channel_snippet['title']
+        channel_title = html_decode(channel_snippet['title'])
         response = service.search().list(part='snippet', maxResults=vcount, channelId=channel_id, order='date', type='').execute()
         channel_vids = []
         img_download_threads = []
@@ -139,7 +141,7 @@ def get_home_page():
     return subs_dict
 
 if __name__ == '__main__':
-    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-    get_front_page(1,1)
-#     results = search('kek', part='snippet')
-#     code.interact(local=locals())
+    # os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    # get_front_page(1,1)
+    results = search('kek', 10, part='snippet')
+    code.interact(local=locals())

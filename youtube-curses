@@ -196,21 +196,10 @@ def main(args):
             elif key == ord('s') or key == ord('S') or key == ord('/'):
                 windowsize = init_display(stdscr)
                 keyword = prompt('Search for videos')
-                data = search(keyword, part='snippet')
+                data = search(keyword, 10, part='snippet')
                 state = 'search'
                 highlight = 0
                 page = 0
-
-#         elif key == ord('r') or key == ord('R'):
-#             if state == "search":
-#                 windowsize = init_display(stdscr)
-#                 data = query_youtube(query[0], query[1])
-#             elif state == "top":
-#                 windowsize = init_display(stdscr)
-#                 data = query_youtube("topgames", 0)
-#                 cache = data
-#             highlight = 0
-#             page = 0
 
             elif key == curses.KEY_RESIZE:
                 curses.endwin()

@@ -2,7 +2,7 @@
 
 # Usage
 
-![Usage](https://i.giphy.com/media/2dq12HoXes5LGVC1da/source.gif)
+![demo](https://i.giphy.com/media/Wq3S8l6kjUto3LS9l3/source.gif)
 This is a simple youtube browser / streamlink frontend made with python and ncurses inspired by [twitch-curses](https://github.com/mvrozanti/twitch-curses).
 
 ## Install
@@ -12,7 +12,7 @@ This is a simple youtube browser / streamlink frontend made with python and ncur
 
 - [ ] Download with `youtube-dl`
 - [X] List subscriptions
-- [ ] Search for content (prompt user)
+- [X] Search for content (prompt user)
 - [ ] Get "recommended videos" (how tho?)
 - [ ] Change sorting order
 - [ ] Like/Dislike bar

@@ -91,7 +91,7 @@ class W3MImageDisplayer(ImageDisplayer, threading.Thread):
 
     def run(self):
         from time import sleep
-        sleep(0.04)
+        sleep(0.18)
         if not self.is_initialized or self.process.poll() is not None: self.initialize()
         if self.path_queue.qsize() == 2: self.path_queue.get()
         path = self.path_queue.get()
