@@ -1,5 +1,7 @@
 # youtube-curses
 
+[![Build Status](https://travis-ci.org/mvrozanti/youtube-curses.svg?branch=master)](https://travis-ci.org/mvrozanti/youtube-curses)
+
 # Usage
 
 ![demo](https://i.giphy.com/media/Wq3S8l6kjUto3LS9l3/source.gif)

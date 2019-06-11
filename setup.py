@@ -10,7 +10,7 @@ setuptools.setup(
 
      version='0.1',
 
-     scripts=['youtube-curses', 'img_display.py', 'query.py'] ,
+     scripts=['youtube-curses.py', 'img_display.py', 'query.py'] ,
 
      author="Marcelo V. Rozanti",
 
@@ -26,6 +26,10 @@ setuptools.setup(
 
      packages=setuptools.find_packages(),
 
-     classifiers=[ ],
+     classifiers=[
+         "Development Status :: 3 - Alpha",
+         "Topic :: Internet",
+         "License :: OSI Approved :: Apache Software License",
+         ],
 
  )
