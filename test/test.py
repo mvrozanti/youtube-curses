@@ -1,7 +1,7 @@
 import unittest
 from ..query.py import QueryRunner
 
-class TestGetFrontPage(unittest.TestCase)
+class TestGetFrontPage(unittest.TestCase):
 
     def test_query_runner():
         qr = QueryRunner()
