@@ -1,16 +1,22 @@
 language: python
+sudo: true
 python:
-  - "2.6"
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.5-dev"
-  - "3.6"
-  - "3.6-dev"
-# command to install dependencies
+- '2.7'
+- '3.4'
+- '3.5'
+- 3.5-dev
+- '3.6'
+- 3.6-dev
+matrix:
+  allow_failures:
+    - python: '2.7'
+    - python: '3.5'
+before_install:
+- openssl aes-256-cbc -K $encrypted_a4c51c48aeec_key -iv $encrypted_a4c51c48aeec_iv
+  -in secret.tar.gz.enc -out secret.tar.gz -d
+- tar zxvf secret.tar.gz
 install:
-  - pip install -r requirements.txt
-# command to run tests
+- sudo apt-get install libgnutls28-dev
+- pip install -r requirements.txt
 script:
-  - pytest test/test.py
+- pytest test/test.py

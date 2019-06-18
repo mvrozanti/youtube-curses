@@ -33,9 +33,10 @@ pool_manager = urllib3.PoolManager()
 class QueryRunner:
 
     def get_authenticated_service(self):
-        credentials_path = op.join(op.dirname(sys.argv[0]), '../credentials.dat')
+        credentials_path = op.join(op.abspath(op.join(op.dirname(op.abspath(__file__)), '..')), 'credentials.dat')
+        # code.interact(local=globals().update(locals()) or globals())
         if not op.exists(credentials_path):
-            flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(op.join(op.abspath(op.join(op.dirname(op.abspath(__file__)), '..')), CLIENT_SECRETS_FILE))
             authorization_url, state = flow.authorization_url(access_type='offline', include_granted_scopes='true')
             credentials = flow.run_local_server()
             with open(credentials_path, 'wb') as credentials_dat: pickle.dump(credentials, credentials_dat)

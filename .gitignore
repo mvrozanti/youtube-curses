@@ -7,3 +7,4 @@ up-pypi.sh
 *.json
 *.dat
 *.log
+secret.tar.gz
