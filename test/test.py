@@ -1,5 +1,5 @@
 import unittest
-from ../src/query.py import QueryRunner
+from ..query.py import QueryRunner
 
 class TestGetFrontPage(unittest.TestCase)
 
