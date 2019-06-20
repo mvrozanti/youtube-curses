@@ -21,4 +21,4 @@ install:
 - sudo apt-get install libgnutls28-dev
 - pip install -r requirements.txt
 script:
-- pytest test/test.py
+- pytest test/test.py && echo Tests passed.
