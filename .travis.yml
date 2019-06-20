@@ -10,6 +10,9 @@ python:
 matrix:
   allow_failures:
     - python: '2.7'
+os:
+  - linux
+  - osx
 before_install:
 - openssl aes-256-cbc -K $encrypted_a4c51c48aeec_key -iv $encrypted_a4c51c48aeec_iv
   -in secret.tar.gz.enc -out secret.tar.gz -d

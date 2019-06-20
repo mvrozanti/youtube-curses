@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-import os
-import sys
-import code
-from math import ceil
-import logging
-from query import get_front_page, search
-import argparse
-import threading
 from img_display import W3MImageDisplayer
-import curses, subprocess
+from math import ceil
+from query import QueryRunner
+import argparse
+import code
+import curses
+import logging
+import os
+import subprocess
+import sys
+import threading
 
 log = logging.getLogger()
 log.setLevel(logging.FATAL)
@@ -56,6 +57,7 @@ def streamlink(url):
 def main(args):
     global windowsize
     global quality
+    qr = QueryRunner()
     # todo: parse args
     w3mid = W3MImageDisplayer()
     highlight = page = hl_cache = p_cache = key = 0
@@ -63,7 +65,7 @@ def main(args):
     donothing = False
 
     # init curses stuff
-    data = get_front_page(args.channel_count, args.video_count)
+    data = qr.get_front_page(args.channel_count, args.video_count)
     stdscr = curses.initscr()
     curses.noecho()
     curses.cbreak()
@@ -209,7 +211,7 @@ def main(args):
             elif key == ord('s') or key == ord('S') or key == ord('/'):
                 windowsize = init_display(stdscr)
                 keyword = prompt('Search for videos')
-                data = search(keyword, 10, part='snippet')
+                data = qr.search(keyword, 10, part='snippet')
                 # state = 'search'
                 state = 'top'
                 highlight = 0
@@ -240,8 +242,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-c', '--channel-count', metavar='N',        default=10,         help='max channels to be queried',             type=int)
     parser.add_argument('-C', '--video-count',   metavar='N',        default=10,         help='video count to be queried',              type=int)
-    parser.add_argument('-q', '--quality',       metavar='N',        default=0,          help='initial video quality [0=best,5=worst]'     )
-    parser.add_argument('-l', '--logfile',       metavar='LOCATION', default=None,          help='default=None'                             )
+    parser.add_argument('-q', '--quality',       metavar='N',        default=0,          help='initial video quality [0=best,5=worst]'          )
+    parser.add_argument('-l', '--logfile',       metavar='LOCATION', default=None,       help='default=None'                                    )
     args = parser.parse_args()
     if args.logfile: logging.basicConfig(filename=args.logfile, level=logging.DEBUG)
     main(args)

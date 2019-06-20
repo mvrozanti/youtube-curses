@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 from __future__ import (absolute_import, division, print_function)
 
-from subprocess import Popen, PIPE
 from queue import Queue
-import threading
-import logging
-import termios
-import struct
+from subprocess import Popen, PIPE
+import code
 import errno
 import fcntl
-import code
-import sys
+import logging
 import os
+import struct
+import sys
+import termios
+import threading
 
 W3MIMGDISPLAY_ENV = "W3MIMGDISPLAY_PATH"
 W3MIMGDISPLAY_OPTIONS = []
